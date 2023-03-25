@@ -1,0 +1,5 @@
+name: MissionPlugin
+version: '${project.version}'
+main: dev.shiro8613.missionplugin.MissionPlugin
+api-version: 1.19
+authors: [ shiro8613 ]
