@@ -16,7 +16,6 @@ public class Mission1 extends Mission {
     public void Tick() {
         getJavaPlugin().getServer().broadcast("aaa", "");
         getEventManager().registerEventHandler(EventEnum.ClickEvent, event -> {
-
         });
     }
 
