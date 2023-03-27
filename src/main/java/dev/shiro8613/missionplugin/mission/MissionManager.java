@@ -1,5 +1,6 @@
 package dev.shiro8613.missionplugin.mission;
 
+import dev.shiro8613.missionplugin.event.EventManager;
 import dev.shiro8613.missionplugin.utils.timer.TimerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,6 +14,7 @@ public class MissionManager {
     private Map<String, Mission> missionMap;
     private JavaPlugin plugin;
     private final TimerManager timerManager = new TimerManager();
+    private final EventManager eventManager = new EventManager();
     private boolean missionState = false;
     private BukkitRunnable progressMission = null;
 
@@ -40,6 +42,7 @@ public class MissionManager {
             mission.init(plugin, timerManager);
             mission.Init();
             missionMap.put(missionName, mission);
+
         }
     }
 

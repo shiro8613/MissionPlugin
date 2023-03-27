@@ -1,23 +1,15 @@
 package dev.shiro8613.missionplugin.event.events;
 
-import dev.shiro8613.missionplugin.event.EventInterface;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
+import dev.shiro8613.missionplugin.event.Event;
+import dev.shiro8613.missionplugin.event.EventEnum;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.util.Objects;
-
-public class ClickEvent extends EventInterface implements Listener {
+public class ClickEvent extends Event implements Listener {
     @EventHandler
     public void onClick(PlayerInteractEvent event){ //ボタンをクリックした時の処理
         //ClickAction
-        if(!event.hasBlock()) return;
-
-        Block clickedBlock = Objects.requireNonNull(event.getClickedBlock());
-        if(clickedBlock.getType() != Material.POLISHED_BLACKSTONE_BUTTON) return;
-
-
+        onEvent(EventEnum.ClickEvent, event);
     }
 }

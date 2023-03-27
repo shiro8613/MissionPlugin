@@ -6,22 +6,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EventManager {
-    private static final EventManager instance = new EventManager();
+    private static final Map<EventEnum, EventHandler> EventHandlerMap = new HashMap<>();
 
-    public static EventManager getInstance() {
-        return instance;
+    public static Map<EventEnum, EventHandler> getEventMap() {
+        return EventHandlerMap;
     }
-
-    private final Map<EventEnum,EventInterface> EventMap = new HashMap<>();
-
-    private final ClickEvent clickEvent = new ClickEvent();
-
 
     public EventManager() {
-        EventMap.put(EventEnum.ClickEvent, clickEvent);
+        new ClickEvent();
     }
 
-
+    public void registerEvent(EventEnum eventEnum, EventHandler eventHandler) {
+        EventHandlerMap.put(eventEnum, eventHandler);
+    }
 
 
 }
