@@ -16,6 +16,8 @@ public final class MissionPlugin extends JavaPlugin {
     private static MissionPlugin instance;
     private static MissionManager missionManager;
 
+    private String SaidByDangomushi = "(|||| ); < ";
+
     public static MissionPlugin getInstance() {
         return instance;
     }
@@ -46,24 +48,32 @@ public final class MissionPlugin extends JavaPlugin {
             /mission state //ミッション実行中かどうか
         */
 
-        sender.sendMessage("実行するコマンドは〜〜〜〜？！？！？！？！ " + args[0]);
+        sender.sendMessage(SaidByDangomushi + "実行したコマンドは: " + args[0]);
 
         switch (args[0]) {
             case "start": {
-                String className = missionManager.getMissionNames()[Integer.parseInt(args[1])-1];
-                sender.sendMessage("実行できるクラス名は〜〜〜〜？！？！？！？！ " + className);
+                String className = "";
+
+                try {
+                    className = missionManager.getMissionNames()[Integer.parseInt(args[1])-1];
+                } catch (Exception ex) {
+                    sender.sendMessage(SaidByDangomushi + "ミッションの指定が間違っています！");
+                    break;
+                }
+
+                sender.sendMessage(SaidByDangomushi + className + "を実行〜〜〜〜！！！！！ ");
                 // ミッションを実行!
                 missionManager.startMission(className);
                 break;
             }
 
             case "list": {
-                sender.sendMessage("実行できるミッションは〜〜〜〜？！？！？！？！");
+                sender.sendMessage(SaidByDangomushi + "実行できるミッション一覧〜〜〜〜！！！！！ ");
                 // ミッション一覧
                 String[] missionNames = missionManager.getMissionNames();
                 sender.sendMessage(ChatColor.AQUA + "------------List------------");
                 for (int i=0; i < missionNames.length; i++) {
-                    sender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i]);
+                    sender.sendMessage(ChatColor.AQUA + "[" + i+1 + "] " + ChatColor.YELLOW + missionNames[i]);
                 }
                 sender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
                 break;
@@ -72,12 +82,15 @@ public final class MissionPlugin extends JavaPlugin {
             case "forcestop": {
                 // ミッション強制停止
                 if (missionManager.forceMissionStop())
-                    sender.sendMessage("ミッションを停止しました");
+                    sender.sendMessage(SaidByDangomushi+"ミッションを停止しました");
                 break;
             }
 
             case "state": {
                 // ミッション実行中かどうか
+                if (missionManager.isMissionState()) {
+                    sender.sendMessage((SaidByDangomushi + "ミッションを実行中です!"));
+                }
                 break;
             }
         }
