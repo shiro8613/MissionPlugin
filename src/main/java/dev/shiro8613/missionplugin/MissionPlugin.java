@@ -27,7 +27,7 @@ public final class MissionPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         missionManager = new MissionManager(this);
-        missionManager.registers(Mission1.class);
+        missionManager.registers(Mission1.class, Mission2.class);
 
     }
 
@@ -46,23 +46,30 @@ public final class MissionPlugin extends JavaPlugin {
         */
 
         sender.sendMessage("実行するコマンドは〜〜〜〜？！？！？！？！ " + args[0]);
-        String className = missionManager.getMissionNames()[Integer.parseInt(args[0])-1];
-        sender.sendMessage("実行できるクラス名は〜〜〜〜？！？！？！？！ " + className);
 
-        switch (args[1]) {
+        switch (args[0]) {
             case "start": {
+                String className = missionManager.getMissionNames()[Integer.parseInt(args[1])-1];
+                sender.sendMessage("実行できるクラス名は〜〜〜〜？！？！？！？！ " + className);
                 // ミッションを実行!
                 missionManager.startMission(className);
                 break;
             }
 
             case "list": {
+                sender.sendMessage("実行できるミッションは〜〜〜〜？！？！？！？！");
                 // ミッション一覧
+                String[] missionNames = missionManager.getMissionNames();
+                for (int i=0; i < missionNames.length; i++) {
+                    sender.sendMessage(missionNames[i]);
+                }
                 break;
             }
 
             case "forcestop": {
                 // ミッション強制停止
+                if (missionManager.forceMissionStop())
+                    sender.sendMessage("ミッションを停止しました");
                 break;
             }
 
