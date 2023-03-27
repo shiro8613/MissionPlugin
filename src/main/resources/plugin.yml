@@ -3,3 +3,7 @@ version: '${project.version}'
 main: dev.shiro8613.missionplugin.MissionPlugin
 api-version: 1.19
 authors: [ shiro8613, dangomushi ]
+commands: #自作プラグインのコマンドを宣言
+  Mission:
+    description: exec Misson1.
+    usage: /Mission [number]

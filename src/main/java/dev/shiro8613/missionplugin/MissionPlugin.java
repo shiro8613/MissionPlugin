@@ -3,6 +3,9 @@ package dev.shiro8613.missionplugin;
 import dev.shiro8613.missionplugin.mission.MissionManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+
 public final class MissionPlugin extends JavaPlugin {
 
     private static MissionPlugin instance;
@@ -26,5 +29,11 @@ public final class MissionPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        sender.sendMessage("実行するコマンドは〜〜〜〜？！？！？！？！ " + args[0] + "どうえぇえええええ〜〜〜〜っすぅうう〜！！！！");
+        return true;
     }
 }
