@@ -61,7 +61,7 @@ public final class MissionPlugin extends JavaPlugin {
                 // ミッション一覧
                 String[] missionNames = missionManager.getMissionNames();
                 for (int i=0; i < missionNames.length; i++) {
-                    sender.sendMessage(missionNames[i]);
+                    sender.sendMessage(i + "->" + missionNames[i]);
                 }
                 break;
             }
