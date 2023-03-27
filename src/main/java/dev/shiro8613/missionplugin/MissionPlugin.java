@@ -27,7 +27,7 @@ public final class MissionPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         missionManager = new MissionManager(this);
-        missionManager.register(Mission1.class);
+        missionManager.registers(Mission1.class);
 
     }
 
@@ -38,7 +38,12 @@ public final class MissionPlugin extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        sender.sendMessage("実行するコマンドは〜〜〜〜？！？！？！？！ " + args[0] + "どうえぇえええええ〜〜〜〜っすぅうう〜！！！！");
+        sender.sendMessage("実行するコマンドは〜〜〜〜？！？！？！？！ " + args[0]);
+        String className = missionManager.getMissionNames()[Integer.parseInt(args[0])-1];
+        sender.sendMessage("実行できるクラス名は〜〜〜〜？！？！？！？！ " + className);
+
+        // ミッション1を実行!
+        missionManager.startMission(className);
         return true;
     }
 }
