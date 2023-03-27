@@ -12,12 +12,13 @@ public class MissionManager {
     private Map<String, Mission> missionMap;
     private JavaPlugin plugin;
     private final TimerManager timerManager = new TimerManager();
-    private final EventManager eventManager = new EventManager();
+    private EventManager eventManager;
     private boolean missionState = false;
     private BukkitRunnable progressMission = null;
 
     public MissionManager(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.eventManager = new EventManager(plugin);
         this.missionMap = new HashMap<>();
     }
 
@@ -34,7 +35,6 @@ public class MissionManager {
                 Mission mission = missionClass.getDeclaredConstructor().newInstance();
                 String missionName = missionClass.getSimpleName();
                 mission.init(plugin, this, timerManager, eventManager);
-                mission.Init();
                 missionMap.put(missionName, mission);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -52,6 +52,7 @@ public class MissionManager {
         if(mission == null) return false;
 
         missionState = true;
+        mission.Init();
         progressMission = new BukkitRunnable() {
             @Override
             public void run() {
