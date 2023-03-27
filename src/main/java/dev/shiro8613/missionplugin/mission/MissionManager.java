@@ -35,7 +35,7 @@ public class MissionManager {
         for(Class<? extends Mission> missionClass : missionClasses) {
             try {
                 Mission mission = missionClass.getDeclaredConstructor().newInstance();
-                String missionName = missionClass.getEnclosingClass().getName();
+                String missionName = missionClass.getName();
                 mission.init(plugin, timerManager, eventManager);
                 mission.Init();
                 missionMap.put(missionName, mission);
