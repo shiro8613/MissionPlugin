@@ -5,6 +5,7 @@ import dev.shiro8613.missionplugin.mission.missions.Mission1;
 import dev.shiro8613.missionplugin.mission.missions.Mission2;
 import dev.shiro8613.missionplugin.mission.missions.Mission3;
 import dev.shiro8613.missionplugin.mission.missions.Mission4;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.bukkit.command.Command;
@@ -60,9 +61,11 @@ public final class MissionPlugin extends JavaPlugin {
                 sender.sendMessage("実行できるミッションは〜〜〜〜？！？！？！？！");
                 // ミッション一覧
                 String[] missionNames = missionManager.getMissionNames();
+                sender.sendMessage(ChatColor.AQUA + "------------List------------");
                 for (int i=0; i < missionNames.length; i++) {
-                    sender.sendMessage(i + "->" + missionNames[i]);
+                    sender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i]);
                 }
+                sender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
                 break;
             }
 
