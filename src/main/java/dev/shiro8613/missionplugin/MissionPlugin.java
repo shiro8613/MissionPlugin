@@ -1,6 +1,10 @@
 package dev.shiro8613.missionplugin;
 
 import dev.shiro8613.missionplugin.mission.MissionManager;
+import dev.shiro8613.missionplugin.mission.missions.Mission1;
+import dev.shiro8613.missionplugin.mission.missions.Mission2;
+import dev.shiro8613.missionplugin.mission.missions.Mission3;
+import dev.shiro8613.missionplugin.mission.missions.Mission4;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.bukkit.command.Command;
@@ -23,6 +27,7 @@ public final class MissionPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         missionManager = new MissionManager(this);
+        missionManager.register(Mission1.class);
 
     }
 

@@ -1,4 +1,7 @@
 package dev.shiro8613.missionplugin.mission.missions;
 
-public class Mission2 {
+import dev.shiro8613.missionplugin.mission.Mission;
+
+public class Mission2{
+
 }

@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class MissionManager {
@@ -24,25 +25,23 @@ public class MissionManager {
     }
 
     @SuppressWarnings("unchecked")
-    public void register(Class<? extends Mission> missionClass)
-            throws NoSuchMethodException, InvocationTargetException,
-            InstantiationException, IllegalAccessException {
-
+    public void register(Class<? extends Mission> missionClass) {
         this.registers(missionClass);
     }
 
     @SuppressWarnings("unchecked")
-    public void registers(Class<? extends Mission>... missionClasses)
-            throws NoSuchMethodException, InvocationTargetException,
-            InstantiationException, IllegalAccessException {
+    public void registers(Class<? extends Mission>... missionClasses) {
 
         for(Class<? extends Mission> missionClass : missionClasses) {
-            Mission mission = missionClass.getDeclaredConstructor().newInstance();
-            String missionName = mission.getClass().getEnclosingClass().getName();
-            mission.init(plugin, timerManager);
-            mission.Init();
-            missionMap.put(missionName, mission);
-
+            try {
+                Mission mission = missionClass.getDeclaredConstructor().newInstance();
+                String missionName = mission.getClass().getEnclosingClass().getName();
+                mission.init(plugin, timerManager, eventManager);
+                mission.Init();
+                missionMap.put(missionName, mission);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 

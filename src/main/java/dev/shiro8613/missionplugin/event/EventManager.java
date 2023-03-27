@@ -16,7 +16,7 @@ public class EventManager {
         new ClickEvent();
     }
 
-    public void registerEvent(EventEnum eventEnum, EventHandler eventHandler) {
+    public void registerEventHandler(EventEnum eventEnum, EventHandler eventHandler) {
         EventHandlerMap.put(eventEnum, eventHandler);
     }
 
