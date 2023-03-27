@@ -2,20 +2,23 @@ package dev.shiro8613.missionplugin.mission.missions;
 
 import dev.shiro8613.missionplugin.event.EventEnum;
 import dev.shiro8613.missionplugin.mission.Mission;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
+import dev.shiro8613.missionplugin.utils.event.EventUtil;
+import org.bukkit.event.player.PlayerInteractEvent;
+
 
 public class Mission1 extends Mission {
 
     @Override
     public void Init() {
-        getJavaPlugin().getServer().broadcast("Hello!", "");
+        getEventManager().registerEventHandler(EventEnum.ClickEvent, (event) -> {
+            PlayerInteractEvent ev = EventUtil.convertEvent(EventEnum.ClickEvent, event ); //これでeventが別な型にキャストされるよ！
+
+        });
     }
 
     @Override
     public void Tick() {
-        getJavaPlugin().getLogger().info("aaaa");
-        missionEnd();
+
     }
 
 }
