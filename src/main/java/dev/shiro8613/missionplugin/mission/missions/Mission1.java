@@ -14,9 +14,8 @@ public class Mission1 extends Mission {
 
     @Override
     public void Tick() {
-        getJavaPlugin().getServer().broadcast("aaa", "");
-        getEventManager().registerEventHandler(EventEnum.ClickEvent, event -> {
-        });
+        getJavaPlugin().getLogger().info("aaaa");
+        missionEnd();
     }
 
 }

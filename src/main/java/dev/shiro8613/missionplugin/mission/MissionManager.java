@@ -2,12 +2,9 @@ package dev.shiro8613.missionplugin.mission;
 
 import dev.shiro8613.missionplugin.event.EventManager;
 import dev.shiro8613.missionplugin.utils.timer.TimerManager;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class MissionManager {
@@ -36,7 +33,7 @@ public class MissionManager {
             try {
                 Mission mission = missionClass.getDeclaredConstructor().newInstance();
                 String missionName = missionClass.getSimpleName();
-                mission.init(plugin, timerManager, eventManager);
+                mission.init(plugin, this, timerManager, eventManager);
                 mission.Init();
                 missionMap.put(missionName, mission);
             } catch (Exception ex) {
@@ -78,5 +75,8 @@ public class MissionManager {
         return missionState;
     }
 
+    public BukkitRunnable getProgressMission() {
+        return progressMission;
+    }
 }
 
