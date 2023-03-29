@@ -3,6 +3,8 @@ package dev.shiro8613.missionplugin.mission.missions;
 import dev.shiro8613.missionplugin.mission.Mission;
 import dev.shiro8613.missionplugin.event.EventEnum;
 import dev.shiro8613.missionplugin.mission.Mission;
+import dev.shiro8613.missionplugin.utils.timer.Timer;
+import dev.shiro8613.missionplugin.utils.timer.TimerEnum;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,7 +29,7 @@ public class Mission2 extends Mission{
     private int bossBar;
     private int tickCounter;
     //private int sixMin = 180*2;
-    private int sixMin = 50;
+    private int sixMin = 500;
     private int nowPhase = 0;
 
     @Override
@@ -37,6 +39,11 @@ public class Mission2 extends Mission{
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1,1);
         bossBar = 10;
         //480
+        // 雑に作ったTimerを使ってみる
+        getTimerManager().createTimer("mission.2.find_shiratama", TimerEnum.CountDown, 2*Timer.TICKS_1_MIN, BarColor.BLUE, BarStyle.SOLID);
+        // 複数はsetの方をどうぞ
+        getTimerManager().getTimerByName("mission.2.find_shiratama").addSubscriber(player);
+        getTimerManager().getTimerByName("mission.2.find_shiratama").setVisibility(true);
         tickCounter = sixMin;
         player.sendMessage(
                     "迷子のお知らせです。\n" +
@@ -50,6 +57,7 @@ public class Mission2 extends Mission{
     @Override
     public void Tick() {
 
+        getTimerManager().getTimerByName("mission.2.find_shiratama").tickTimer();
         if (tickCounter == sixMin && bossBar >= 0) {
             //getJavaPlugin().getServer().sendMessage(Component.text(bossBar*0.1));
             bar.setProgress(bossBar--*0.1);
@@ -64,6 +72,11 @@ public class Mission2 extends Mission{
         }
         else if (tickCounter < sixMin) {
             tickCounter++;
+        }
+
+        if (getTimerManager().getTimerByName("mission.2.find_shiratama").isFinished()) {
+            givePotion();
+            bossBar = -1;
         }
 
         if (bossBar == -1) {
@@ -103,5 +116,6 @@ public class Mission2 extends Mission{
     @Override
     public void onDisable() {
         bar.removeAll();
+        getTimerManager().discardTimerByName("mission.2.find_shiratama");
     }
 }

@@ -53,11 +53,11 @@ public final class MissionPlugin extends JavaPlugin {
         sender.sendMessage(SaidByDangomushi + "実行したコマンドは: " + args[0]);
 
         switch (args[0]) {
-            case "start": {
+            case "start" -> {
                 String className = "";
 
                 try {
-                    className = missionManager.getMissionNames()[Integer.parseInt(args[1])-1];
+                    className = missionManager.getMissionNames()[Integer.parseInt(args[1]) - 1];
                 } catch (Exception ex) {
                     sender.sendMessage(SaidByDangomushi + "ミッションの指定が間違っています！");
                     break;
@@ -66,34 +66,27 @@ public final class MissionPlugin extends JavaPlugin {
                 sender.sendMessage(SaidByDangomushi + className + "を実行〜〜〜〜！！！！！ ");
                 // ミッションを実行!
                 missionManager.startMission(className);
-                break;
             }
-
-            case "list": {
+            case "list" -> {
                 sender.sendMessage(SaidByDangomushi + "実行できるミッション一覧〜〜〜〜！！！！！ ");
                 // ミッション一覧
                 String[] missionNames = missionManager.getMissionNames();
                 sender.sendMessage(ChatColor.AQUA + "------------List------------");
-                for (int i=1; i < missionNames.length; i++) {
-                    sender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i-1]);
+                for (int i = 1; i < missionNames.length; i++) {
+                    sender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i - 1]);
                 }
                 sender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
-                break;
             }
-
-            case "forcestop": {
+            case "forcestop" -> {
                 // ミッション強制停止
                 if (missionManager.forceMissionStop())
-                    sender.sendMessage(SaidByDangomushi+"ミッションを停止しました");
-                break;
+                    sender.sendMessage(SaidByDangomushi + "ミッションを停止しました");
             }
-
-            case "state": {
+            case "state" -> {
                 // ミッション実行中かどうか
                 if (missionManager.isMissionState()) {
                     sender.sendMessage((SaidByDangomushi + "ミッションを実行中です!"));
                 }
-                break;
             }
         }
 
