@@ -48,6 +48,8 @@ public final class MissionPlugin extends JavaPlugin {
             /mission state //ミッション実行中かどうか
         */
 
+        if(args.length < 1 ) return false;
+
         sender.sendMessage(SaidByDangomushi + "実行したコマンドは: " + args[0]);
 
         switch (args[0]) {
@@ -72,8 +74,8 @@ public final class MissionPlugin extends JavaPlugin {
                 // ミッション一覧
                 String[] missionNames = missionManager.getMissionNames();
                 sender.sendMessage(ChatColor.AQUA + "------------List------------");
-                for (int i=0; i < missionNames.length; i++) {
-                    sender.sendMessage(ChatColor.AQUA + "[" + i+1 + "] " + ChatColor.YELLOW + missionNames[i]);
+                for (int i=1; i < missionNames.length; i++) {
+                    sender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i-1]);
                 }
                 sender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
                 break;
