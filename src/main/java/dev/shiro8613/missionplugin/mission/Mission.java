@@ -56,4 +56,6 @@ public abstract class Mission {
 
     public abstract void Tick();
 
+    public abstract void onDisable();
+
 }
