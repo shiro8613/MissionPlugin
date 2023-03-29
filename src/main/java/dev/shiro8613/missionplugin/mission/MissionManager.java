@@ -4,6 +4,7 @@ import dev.shiro8613.missionplugin.event.EventManager;
 import dev.shiro8613.missionplugin.utils.timer.TimerManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -14,7 +15,7 @@ public class MissionManager {
     private final TimerManager timerManager = new TimerManager();
     private EventManager eventManager;
     private boolean missionState = false;
-    private BukkitRunnable progressMission = null;
+    private ProgressMission progressMission = null;
 
     public MissionManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -53,20 +54,21 @@ public class MissionManager {
 
         missionState = true;
         mission.Init();
-        progressMission = new BukkitRunnable() {
+        BukkitRunnable tmpTask = new BukkitRunnable() {
             @Override
             public void run() {
                 mission.Tick();
             }
         };
-        progressMission.runTaskTimer(plugin,1,0);
+        progressMission = ProgressMission.create(name, tmpTask.runTaskTimer(plugin,1,0));
         return true;
     }
 
     public boolean forceMissionStop() {
-        if(missionState) return false;
+        if(!missionState) return false;
         if(progressMission == null) return false;
-        progressMission.cancel();
+        missionMap.get(progressMission.missionName).onDisable();
+        progressMission.task.cancel();
         missionState = false;
         progressMission = null;
         return true;
@@ -76,8 +78,8 @@ public class MissionManager {
         return missionState;
     }
 
-    public BukkitRunnable getProgressMission() {
-        return progressMission;
+    public BukkitTask getProgressMission() {
+        return progressMission.task;
     }
 }
 
