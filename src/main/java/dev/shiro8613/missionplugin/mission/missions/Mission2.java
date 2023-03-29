@@ -23,7 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 public class Mission2 extends Mission{
 
     private Player player = null;
-    private BossBar bar;
+    private final BossBar bar = Bukkit.createBossBar("残り時間:", BarColor.YELLOW, BarStyle.SOLID);
     private int bossBar;
     private int tickCounter;
     //private int sixMin = 180*2;
@@ -45,16 +45,13 @@ public class Mission2 extends Mission{
                         "5人の逃走者が写真を貼ることができればミッション達成です。\n" +
                         "全員に俊足の ポーションをお渡しします。\n" +
                         "もし制限時間内に達成できなければ、逃走者全員が10 秒間発光します。");
-        bar = Bukkit.createBossBar("残り時間:", BarColor.YELLOW, BarStyle.SOLID);
     }
 
     @Override
     public void Tick() {
 
         if (tickCounter == sixMin && bossBar >= 0) {
-            bar.removeAll();
-            getJavaPlugin().getServer().sendMessage(Component.text(bossBar*0.1));
-            bar = Bukkit.createBossBar("残り時間:", BarColor.YELLOW, BarStyle.SOLID);
+            //getJavaPlugin().getServer().sendMessage(Component.text(bossBar*0.1));
             bar.setProgress(bossBar--*0.1);
             bar.addPlayer(player);
             bar.setVisible(true);
@@ -101,5 +98,10 @@ public class Mission2 extends Mission{
         ItemStack potion = new ItemStack(Material.POTION, 1); // ポーション
         player.addPotionEffect ( new PotionEffect ( PotionEffectType.HEAL, 200, 1 ) );
          */
+    }
+
+    @Override
+    public void onDisable() {
+        bar.removeAll();
     }
 }
