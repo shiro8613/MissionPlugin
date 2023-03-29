@@ -37,8 +37,7 @@ public abstract class Mission {
     }
 
     public void missionEnd() {
-        missionManager.getProgressMission().cancel();
-        eventManager.removeAll();
+        missionManager.forceMissionStop();
     }
 
     public EventManager getEventManager() {

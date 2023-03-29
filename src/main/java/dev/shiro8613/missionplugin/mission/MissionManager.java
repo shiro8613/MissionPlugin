@@ -69,6 +69,7 @@ public class MissionManager {
         if(progressingMission == null) return false;
         missionMap.get(progressingMission.missionName).onDisable();
         progressingMission.task.cancel();
+        eventManager.removeAll();
         missionState = false;
         progressingMission = null;
         return true;
