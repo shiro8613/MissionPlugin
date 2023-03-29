@@ -15,7 +15,7 @@ public class MissionManager {
     private final TimerManager timerManager = new TimerManager();
     private EventManager eventManager;
     private boolean missionState = false;
-    private ProgressMission progressMission = null;
+    private ProgressingMission progressingMission = null;
 
     public MissionManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -60,17 +60,17 @@ public class MissionManager {
                 mission.Tick();
             }
         };
-        progressMission = ProgressMission.create(name, tmpTask.runTaskTimer(plugin,1,0));
+        progressingMission = ProgressingMission.create(name, tmpTask.runTaskTimer(plugin,1,0));
         return true;
     }
 
     public boolean forceMissionStop() {
         if(!missionState) return false;
-        if(progressMission == null) return false;
-        missionMap.get(progressMission.missionName).onDisable();
-        progressMission.task.cancel();
+        if(progressingMission == null) return false;
+        missionMap.get(progressingMission.missionName).onDisable();
+        progressingMission.task.cancel();
         missionState = false;
-        progressMission = null;
+        progressingMission = null;
         return true;
     }
 
@@ -79,7 +79,7 @@ public class MissionManager {
     }
 
     public BukkitTask getProgressMission() {
-        return progressMission.task;
+        return progressingMission.task;
     }
 }
 
