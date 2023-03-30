@@ -1,13 +1,14 @@
 package dev.shiro8613.missionplugin.event;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public enum EventEnum {
-    ClickEvent(PlayerInteractEvent.class);
-
+    ClickEvent(PlayerInteractEvent.class),
+    ChatEvent(AsyncChatEvent.class);
     private Class<?> eventsClass;
 
-    private EventEnum(Class<?> eventsClass) {
+    EventEnum(Class<?> eventsClass) {
         this.eventsClass = eventsClass;
     }
 
