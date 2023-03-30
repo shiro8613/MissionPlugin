@@ -26,7 +26,13 @@ public class CountDownTimer extends Timer{
 
     @Override
     protected void updateRemainingTime()  {
-        int dTick = this.tickProgress;
-        this.bar.setTitle("残り時間: " + ((dTick < TICKS_1_MIN) ? (dTick/TICKS_1_SEC + "秒") : (dTick/TICKS_1_MIN + "分"+ (dTick%TICKS_1_MIN)/TICKS_1_SEC +"秒")));
+        String timeStr = "";
+        int tmpTick = this.tickProgress;
+        if (tmpTick >= TICKS_1_MIN) {
+            timeStr += (tmpTick / TICKS_1_MIN) + "分";
+            tmpTick %= TICKS_1_MIN;
+        }
+        timeStr += (tmpTick / TICKS_1_SEC) + "秒";
+        this.bar.setTitle("残り時間: " + timeStr);
     }
 }

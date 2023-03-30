@@ -24,6 +24,9 @@ public class TimerManager {
 
     public void discardTimerByName(String query) {
         Timer target = activeTimers.get(query);
+        if (target == null) {
+            return;
+        }
         target.setVisibility(false);
         activeTimers.remove(query);
     }
