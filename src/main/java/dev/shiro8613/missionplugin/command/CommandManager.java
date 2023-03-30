@@ -25,6 +25,10 @@ public class CommandManager {
         this.firstCommandList.put("ctl", context -> {
             String[] args = context.getArgs();
             CommandSender commandSender = context.getCommandSender();
+            if(args.length < 1) {
+                commandSender.sendMessage("引数ちょーだい！");
+                return;
+            }
             String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
             CommandHandler commandHandler = tmpMissionCommandMap.get(args[0]);
             if(commandHandler != null) {

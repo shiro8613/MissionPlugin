@@ -34,7 +34,7 @@ public class FirstCommand {
             if(args.length < 1) commandSender.sendMessage("コマンドミスってるよ");
             int index = Integer.parseInt(args[0]);
             try {
-                String missionName = missionManager.getMissionNames()[index];
+                String missionName = missionManager.getMissionNames()[index -1];
                 missionManager.startMission(missionName);
             } catch (Exception e) {
                 commandSender.sendMessage("その番号のミッション無いって");
