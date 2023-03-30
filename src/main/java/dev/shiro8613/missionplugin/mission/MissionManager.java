@@ -1,6 +1,7 @@
 package dev.shiro8613.missionplugin.mission;
 
 import dev.shiro8613.missionplugin.command.CommandManager;
+import dev.shiro8613.missionplugin.command.MissionCommandManager;
 import dev.shiro8613.missionplugin.event.EventManager;
 import dev.shiro8613.missionplugin.utils.timer.TimerManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +15,7 @@ public class MissionManager {
     private Map<String, Mission> missionMap;
     private JavaPlugin plugin;
     private final TimerManager timerManager = new TimerManager();
-    private final CommandManager commandManager = new CommandManager();
+    private MissionCommandManager commandManager;
     private EventManager eventManager;
     private boolean missionState = false;
     private ProgressingMission progressingMission = null;
@@ -23,6 +24,7 @@ public class MissionManager {
         this.plugin = plugin;
         this.eventManager = new EventManager(plugin);
         this.missionMap = new HashMap<>();
+        this.commandManager = new MissionCommandManager(new CommandManager(plugin, this));
     }
 
     @SuppressWarnings("unchecked")
