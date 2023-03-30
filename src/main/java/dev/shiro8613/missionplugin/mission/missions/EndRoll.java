@@ -30,6 +30,6 @@ public class EndRoll extends Mission {
 
     @Override
     public void onDisable() {
-
+        getEventManager().removeAll();
     }
 }

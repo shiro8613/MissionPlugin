@@ -21,6 +21,7 @@ public class Mission1 extends Mission {
         sec = 30;
         view = 1;
         tmpSec = sec % 100;
+
     }
 
     @Override

@@ -26,9 +26,22 @@ public class EventManager {
         }
     }
 
+    /**
+     * イベントが発火した際に実行される関数を登録できます。
+     * @param eventEnum イベントの種類
+     * @param eventHandler 発火した際に呼ばれる関数
+     */
+
     public void registerEventHandler(EventEnum eventEnum, EventHandler eventHandler) {
         EventHandlerMap.put(eventEnum, eventHandler);
     }
+
+    /**
+     * ミッション毎に登録されているイベントをすべて削除します。
+     * ミッション終了時に呼び出さないと
+     * 他のミッションの実行時に呼び出されてしまうため
+     * 必ず、onDisable()で呼び出してください。
+     */
 
     public void removeAll() {
         EventHandlerMap.clear();
