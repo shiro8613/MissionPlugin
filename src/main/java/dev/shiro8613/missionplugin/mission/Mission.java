@@ -1,7 +1,5 @@
 package dev.shiro8613.missionplugin.mission;
 
-import dev.shiro8613.missionplugin.command.Command;
-import dev.shiro8613.missionplugin.command.CommandManager;
 import dev.shiro8613.missionplugin.event.EventManager;
 import dev.shiro8613.missionplugin.utils.timer.TimerManager;
 import org.bukkit.Bukkit;
@@ -19,7 +17,6 @@ public abstract class Mission {
     private TimerManager timerManager = null;
     private EventManager eventManager = null;
     private MissionManager missionManager = null;
-    private CommandManager commandManager = null;
 
     public JavaPlugin getJavaPlugin() {
         return javaPlugin;
@@ -27,10 +24,6 @@ public abstract class Mission {
 
     public TimerManager getTimerManager() {
         return timerManager;
-    }
-
-    public CommandManager getCommandManager() {
-        return commandManager;
     }
 
     public List<Player> getPlayers() {
@@ -51,12 +44,11 @@ public abstract class Mission {
         return eventManager;
     }
 
-    final void init(JavaPlugin pl, MissionManager missionManager , TimerManager timerManager, EventManager eventManager, CommandManager commandManager) {
+    final void init(JavaPlugin pl,MissionManager missionManager , TimerManager timerManager, EventManager eventManager) {
         this.javaPlugin = pl;
         this.missionManager = missionManager;
         this.timerManager = timerManager;
         this.eventManager = eventManager;
-        this.commandManager = commandManager;
     }
 
     public abstract void Init();

@@ -1,6 +1,5 @@
 package dev.shiro8613.missionplugin.mission;
 
-import dev.shiro8613.missionplugin.command.CommandManager;
 import dev.shiro8613.missionplugin.event.EventManager;
 import dev.shiro8613.missionplugin.utils.timer.TimerManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +13,6 @@ public class MissionManager {
     private Map<String, Mission> missionMap;
     private JavaPlugin plugin;
     private final TimerManager timerManager = new TimerManager();
-    private final CommandManager commandManager = new CommandManager();
     private EventManager eventManager;
     private boolean missionState = false;
     private ProgressingMission progressingMission = null;
@@ -37,7 +35,7 @@ public class MissionManager {
             try {
                 Mission mission = missionClass.getDeclaredConstructor().newInstance();
                 String missionName = missionClass.getSimpleName();
-                mission.init(plugin, this, timerManager, eventManager, commandManager);
+                mission.init(plugin, this, timerManager, eventManager);
                 missionMap.put(missionName, mission);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
