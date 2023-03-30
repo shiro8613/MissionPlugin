@@ -1,7 +1,10 @@
 package dev.shiro8613.missionplugin;
 
 import dev.shiro8613.missionplugin.mission.MissionManager;
-import dev.shiro8613.missionplugin.mission.missions.*;
+import dev.shiro8613.missionplugin.mission.missions.Mission1;
+import dev.shiro8613.missionplugin.mission.missions.Mission2;
+import dev.shiro8613.missionplugin.mission.missions.Mission3;
+import dev.shiro8613.missionplugin.mission.missions.Mission4;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,7 +30,7 @@ public final class MissionPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         missionManager = new MissionManager(this);
-        missionManager.registers(Mission1.class, Mission2.class, EndRoll.class);
+        missionManager.registers(Mission1.class, Mission2.class);
 
     }
 
@@ -71,8 +74,8 @@ public final class MissionPlugin extends JavaPlugin {
                 // ミッション一覧
                 String[] missionNames = missionManager.getMissionNames();
                 sender.sendMessage(ChatColor.AQUA + "------------List------------");
-                for (int i=0; i < missionNames.length; i++) {
-                    sender.sendMessage(ChatColor.AQUA + "[" + (i+1) + "] " + ChatColor.YELLOW + missionNames[i]);
+                for (int i=1; i < missionNames.length; i++) {
+                    sender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i-1]);
                 }
                 sender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
                 break;
