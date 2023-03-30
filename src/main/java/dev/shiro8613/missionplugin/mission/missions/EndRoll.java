@@ -2,21 +2,24 @@ package dev.shiro8613.missionplugin.mission.missions;
 
 import dev.shiro8613.missionplugin.event.EventEnum;
 import dev.shiro8613.missionplugin.mission.Mission;
-import dev.shiro8613.missionplugin.utils.event.EventUtil;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.TitlePart;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class EndRoll extends Mission {
 
     @Override
     public void Init() {
-        getEventManager().registerEventHandler(EventEnum.ChatEvent, event -> {
-            AsyncChatEvent chatEvent = EventUtil.convertEvent(EventEnum.ChatEvent, event);
+        getEventManager().registerEventHandler(EventEnum.ChatEvent, eventContext -> {
+            AsyncChatEvent chatEvent = eventContext.getEvent(EventEnum.ChatEvent);
             chatEvent.setCancelled(true);
             Component text = Component.text("エンドロール中は発言ができません。", NamedTextColor.RED);
             chatEvent.getPlayer().sendActionBar(text);
+        });
+
+        getCommandManager().addCmd("stop", context -> {
+            context.getCommandSender().sendMessage("aaa");
         });
     }
 

@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class ClickEvent extends Event implements Listener {
     @EventHandler
     public void onClick(PlayerInteractEvent event){ //ボタンをクリックした時の処理
-        //ClickAction
         onEvent(EventEnum.ClickEvent, event);
     }
 }
