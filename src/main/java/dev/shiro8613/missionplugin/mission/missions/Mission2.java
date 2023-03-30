@@ -11,16 +11,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
@@ -60,12 +57,12 @@ public class Mission2 extends Mission{
 
         tickCounter = sixMin;
         player.sendMessage(
-                    "迷子のお知らせです。\n" +
-                        "ピンクのスカートを着て、サングラス を掛けた、白玉のような女の子を探しています。" +
-                        "もし見つけましたらその子と一緒 に写真を撮り、写真をdiscordの『#逃走中ミッション』チャンネルにお貼りください。\n" +
-                        "5人の逃走者が写真を貼ることができればミッション達成です。\n" +
-                        "全員に俊足の ポーションをお渡しします。\n" +
-                        "もし制限時間内に達成できなければ、逃走者全員が10 秒間発光します。");
+                """
+                        迷子のお知らせです。
+                        ピンクのスカートを着て、サングラス を掛けた、白玉のような女の子を探しています。もし見つけましたらその子と一緒 に写真を撮り、写真をdiscordの『#逃走中ミッション』チャンネルにお貼りください。
+                        5人の逃走者が写真を貼ることができればミッション達成です。
+                        全員に俊足の ポーションをお渡しします。
+                        もし制限時間内に達成できなければ、逃走者全員が10 秒間発光します。""");
     }
 
     @Override
@@ -106,7 +103,9 @@ public class Mission2 extends Mission{
         // 報酬アイテム情報の設定
         reward.setType(Material.POTION);
         var pm = (PotionMeta) reward.getItemMeta();
-        pm.setBasePotionData(new PotionData(PotionType.SPEED));
+        pm.setBasePotionData(new PotionData(PotionType.WATER));
+        pm.displayName(Component.translatable("item.minecraft.potion.effect.swiftness").color(NamedTextColor.AQUA));
+        pm.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 10*Timer.TICKS_1_SEC,3, false, true, true), true);
         reward.setItemMeta(pm);
 
         // ミッション開始通知
@@ -120,7 +119,7 @@ public class Mission2 extends Mission{
             p.sendMessage(Component.text("迷子のお知らせです。",NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
             p.sendMessage(Component.text("ピンクのスカート",NamedTextColor.LIGHT_PURPLE).append(Component.text("を着て、サングラスを掛けた、", NamedTextColor.YELLOW)).append(Component.text("白玉のような女の子", NamedTextColor.WHITE)).append(Component.text("を探しています。", NamedTextColor.YELLOW)));
             // TODO: 使用時はリンク先を正しいものに変更するかリンクを開く機能を削除してください。
-            p.sendMessage(Component.text("もし見つけましたらその子と一緒に写真を撮り、写真を",NamedTextColor.YELLOW).append(Component.text("Discordの『#逃走中ミッション』チャンネル", NamedTextColor.GOLD)).clickEvent(ClickEvent.openUrl("https://discord.com/channels/1046066805552189440/1080796750303997973")).append(Component.text("にお貼りください。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("もし見つけましたらその子と一緒に写真を撮り、写真を",NamedTextColor.YELLOW).append(Component.text("Discordの『#逃走中ミッション』チャンネル", NamedTextColor.GOLD)).clickEvent(ClickEvent.openUrl("https://discord.com/channels/1046066805552189440/1080796750303997973")).hoverEvent(Component.text("クリックするとWebブラウザで開きます")).append(Component.text("にお貼りください。", NamedTextColor.YELLOW)));
             p.sendMessage(Component.text("5人の逃走者が写真を貼ることができれば",NamedTextColor.YELLOW).append(Component.text("ミッション成功", NamedTextColor.GREEN)).append(Component.text("です。", NamedTextColor.YELLOW)));
             p.sendMessage(Component.text("全員に",NamedTextColor.YELLOW).append(reward.displayName().color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true)).append(Component.text("をお渡しします。")));
             p.sendMessage(Component.text("もし制限時間内に達成できなければ、",NamedTextColor.YELLOW).append(Component.text("逃走者全員が10秒間発光します", NamedTextColor.RED, TextDecoration.UNDERLINED)).append(Component.text("。", NamedTextColor.YELLOW)));
