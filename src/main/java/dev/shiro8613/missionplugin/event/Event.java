@@ -4,6 +4,6 @@ public class Event {
     public void onEvent(EventEnum eventEnum, org.bukkit.event.Event event) {
         EventHandler eventHandler =  EventManager.getEventMap().get(eventEnum);
         if(eventHandler == null) return;
-        eventHandler.Run(event);
+        eventHandler.Run(EventContext.create(event));
     }
 }
