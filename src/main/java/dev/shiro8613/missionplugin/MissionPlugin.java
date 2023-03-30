@@ -90,6 +90,8 @@ public final class MissionPlugin extends JavaPlugin {
                 // ミッション実行中かどうか
                 if (missionManager.isMissionState()) {
                     sender.sendMessage((SaidByDangomushi + "ミッションを実行中です!"));
+                } else {
+                    sender.sendMessage(SaidByDangomushi + "実行中のミッションはないよ！");
                 }
             }
         }
