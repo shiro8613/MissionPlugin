@@ -1,9 +1,12 @@
 package dev.shiro8613.missionplugin.event;
 
+import dev.shiro8613.missionplugin.event.events.ChatEvent;
 import dev.shiro8613.missionplugin.event.events.ClickEvent;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EventManager {
@@ -14,7 +17,13 @@ public class EventManager {
     }
 
     public EventManager(JavaPlugin plugin) {
-        plugin.getServer().getPluginManager().registerEvents(new ClickEvent(), plugin);
+        registerAssist(plugin, new ClickEvent(), new ChatEvent());
+    }
+
+    private void registerAssist(JavaPlugin plugin, Listener... listeners) {
+        for(Listener listener :listeners) {
+            plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+        }
     }
 
     public void registerEventHandler(EventEnum eventEnum, EventHandler eventHandler) {
