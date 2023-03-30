@@ -6,6 +6,9 @@ import org.bukkit.boss.BarStyle;
 
 import javax.annotation.Nullable;
 
+/**
+ * カウントダウンタイプのタイマー実装
+ */
 public class CountDownTimer extends Timer{
     public CountDownTimer(int goal, BarColor barColor, BarStyle barStyle, @Nullable BarFlag... barFlags) {
         super(goal, TimerEnum.CountDown, barColor, barStyle, barFlags);
@@ -16,6 +19,7 @@ public class CountDownTimer extends Timer{
     @Override
     public double tickTimer() {
         this.tickProgress--;
+        if (this.tickProgress % TICKS_1_SEC == 0) {this.updateRemainingTime();}
         return super.tickTimer();
     }
 

@@ -1,5 +1,6 @@
 package dev.shiro8613.missionplugin.mission.missions;
 
+import dev.shiro8613.missionplugin.command.CommandContext;
 import dev.shiro8613.missionplugin.mission.Mission;
 import dev.shiro8613.missionplugin.utils.timer.Timer;
 import dev.shiro8613.missionplugin.utils.timer.TimerEnum;
@@ -24,11 +25,12 @@ import java.util.List;
 
 public class Mission2 extends Mission{
 
+    private enum MissionState {Start, OnGoing, End}
     private List<Player> challengers = null;
     private final ItemStack reward = new ItemStack(Material.AIR);
-    private int state;
+    private MissionState state = MissionState.Start;
     private int timeLimit = 6*Timer.TICKS_1_MIN;
-    private int nowPhase = 0;
+    private final int requiredChecks = 5;
 
     @Override
     public void Init() {
@@ -37,10 +39,15 @@ public class Mission2 extends Mission{
         greet();
         // 雑に作ったTimerを使ってみる
         getTimerManager().createTimer("mission.2.find_shiratama", TimerEnum.CountDown, timeLimit, BarColor.BLUE, BarStyle.SOLID);
+        getTimerManager().createTimer("mission.2.approved_player", TimerEnum.TaskProgress, requiredChecks, BarColor.GREEN, BarStyle.SEGMENTED_10);
         // 複数はsetSubscribersが便利です
         getTimerManager().getTimerByName("mission.2.find_shiratama").setSubscribers(challengers);
+        getTimerManager().getTimerByName("mission.2.approved_player").setSubscribers(challengers);
         getTimerManager().getTimerByName("mission.2.find_shiratama").setVisibility(true);
+        getTimerManager().getTimerByName("mission.2.approved_player").setVisibility(true);
 
+        state = MissionState.OnGoing;
+        getCommandManager().addCmd("chkMsg", this::checkMessageCmd);
     }
 
     @Override
@@ -49,15 +56,23 @@ public class Mission2 extends Mission{
         getTimerManager().getTimerByName("mission.2.find_shiratama").tickTimer();
 
         if (getTimerManager().getTimerByName("mission.2.find_shiratama").isFinished()) {
-            givePotion();
-            state = -1;
+            state = MissionState.End;
+            onFail();
         }
 
-        if (state == -1) {
+        if (state == MissionState.End) {
             challengers.forEach(p ->p.sendMessage("ミッションを終了します"));
             // ここのメソッド動かない！！
             // そんな時代も414fdac919775820ce5dc2582d04c2b39dd34be1より前にはありました...
             missionEnd();
+        }
+    }
+
+    private void checkMessageCmd(CommandContext ctx) {
+        ctx.getCommandSender().sendMessage(Component.text("1プレイヤーの画像の確認が済んだものとしてマークします。", NamedTextColor.AQUA));
+        getTimerManager().getTimerByName("mission.2.approved_player").tickTimer();
+        if (getTimerManager().getTimerByName("mission.2.approved_player").isFinished()) {
+            onSuccess();
         }
     }
 
@@ -88,7 +103,17 @@ public class Mission2 extends Mission{
         });
     }
 
-    public void givePotion() {
+    public void onSuccess() {
+        state = MissionState.End;
+        final var successTitle = Component.text("ミッション成功", NamedTextColor.GREEN);
+        final var successSubTitle = Component.text("ミッションに成功したため、逃走者全員に報酬が配布されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
+        challengers.forEach(p -> {
+            p.getInventory().addItem(reward);
+            p.showTitle(Title.title(successTitle, successSubTitle));
+            p.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Sound.Source.HOSTILE, 1f, 1.1f));
+        });
+    }
+    public void onFail() {
 /*
         // ゲームクリアの場合
         ItemStack potion = new ItemStack(Material.POTION, 1);
@@ -105,8 +130,14 @@ public class Mission2 extends Mission{
 
 */
         // ゲームオーバーの場合
+        final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
+        final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
         var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC*10, 1);
-        challengers.forEach(p -> p.addPotionEffect(deBuff));
+        challengers.forEach(p -> {
+            p.addPotionEffect(deBuff);
+            p.showTitle(Title.title(failTitle, failSubTitle));
+            p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
+        });
 
         /*
         PlayerInventory inventory = player.getInventory(); // プレイヤーのインベントリ
@@ -118,5 +149,7 @@ public class Mission2 extends Mission{
     @Override
     public void onDisable() {
         getTimerManager().discardTimerByName("mission.2.find_shiratama");
+        getTimerManager().discardTimerByName("mission.2.approved_player");
+        getCommandManager().removeAll();
     }
 }
