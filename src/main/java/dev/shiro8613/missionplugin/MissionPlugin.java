@@ -10,6 +10,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class MissionPlugin extends JavaPlugin {
 
@@ -91,5 +95,33 @@ public final class MissionPlugin extends JavaPlugin {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+        if (cmd.getName().equalsIgnoreCase("mission")) {
+            final List<String> argResponse = new ArrayList<>();
+            final List<String> availableSubCmd = new ArrayList<>();
+            availableSubCmd.add("start");
+            availableSubCmd.add("list");
+            availableSubCmd.add("forcestop");
+            availableSubCmd.add("state");
+
+            if (args.length == 0) {
+                return availableSubCmd;
+            }
+            if (args.length == 1) {
+                StringUtil.copyPartialMatches(args[0], availableSubCmd, argResponse);
+                return argResponse;
+            }
+            if (args.length == 2 && args[0].equalsIgnoreCase("start")) {
+                for (int i = 1; i <= missionManager.getMissionNames().length; i++) {
+                    argResponse.add(Integer.toString(i));
+                }
+                return argResponse;
+            }
+            return argResponse;
+        }
+        return null;
     }
 }
