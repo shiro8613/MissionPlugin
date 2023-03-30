@@ -2,10 +2,7 @@ package dev.shiro8613.missionplugin;
 
 import dev.shiro8613.missionplugin.command.CommandManager;
 import dev.shiro8613.missionplugin.mission.MissionManager;
-import dev.shiro8613.missionplugin.mission.missions.Mission1;
-import dev.shiro8613.missionplugin.mission.missions.Mission2;
-import dev.shiro8613.missionplugin.mission.missions.Mission3;
-import dev.shiro8613.missionplugin.mission.missions.Mission4;
+import dev.shiro8613.missionplugin.mission.missions.*;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,7 +30,7 @@ public final class MissionPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         missionManager = new MissionManager(this);
-        missionManager.registers(Mission1.class, Mission2.class);
+        missionManager.registers(Mission1.class, Mission2.class, EndRoll.class);
 
     }
 
