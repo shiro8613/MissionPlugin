@@ -114,21 +114,6 @@ public class Mission2 extends Mission{
         });
     }
     public void onFail() {
-/*
-        // ゲームクリアの場合
-        ItemStack potion = new ItemStack(Material.POTION, 1);
-
-        PotionMeta potionmeta = (PotionMeta) potion.getItemMeta();
-        potionmeta.setMainEffect(PotionEffectType.HEAL);
-
-        PotionEffect heal = new PotionEffect(PotionEffectType.HEAL, 1000, 1);
-        potionmeta.addCustomEffect(heal, true);
-        potionmeta.setDisplayName("治癒のポーション");
-        potion.setItemMeta(potionmeta);
-
-        player.getInventory().addItem(potion);
-
-*/
         // ゲームオーバーの場合
         state = MissionState.End;
         final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
@@ -139,12 +124,6 @@ public class Mission2 extends Mission{
             p.showTitle(Title.title(failTitle, failSubTitle));
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
         });
-
-        /*
-        PlayerInventory inventory = player.getInventory(); // プレイヤーのインベントリ
-        ItemStack potion = new ItemStack(Material.POTION, 1); // ポーション
-        player.addPotionEffect ( new PotionEffect ( PotionEffectType.HEAL, 200, 1 ) );
-         */
     }
 
     @Override
