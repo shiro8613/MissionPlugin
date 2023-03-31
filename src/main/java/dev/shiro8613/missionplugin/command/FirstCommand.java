@@ -34,7 +34,7 @@ public class FirstCommand {
             if(args.length < 1) commandSender.sendMessage("コマンドミスってるよ");
             int index = Integer.parseInt(args[0]);
             try {
-                String missionName = missionManager.getMissionNames()[index -1];
+                String missionName = missionManager.getMissionNames()[index];
                 missionManager.startMission(missionName);
             } catch (Exception e) {
                 commandSender.sendMessage("その番号のミッション無いって");
@@ -47,8 +47,8 @@ public class FirstCommand {
             CommandSender commandSender = context.getCommandSender();
             String[] missionNames = missionManager.getMissionNames();
             commandSender.sendMessage(ChatColor.AQUA + "------------List------------");
-            for (int i = 1; i <= missionNames.length; i++) {
-                commandSender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i - 1]);
+            for (int i = 0; i < missionNames.length; i++) {
+                commandSender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i]);
             }
             commandSender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
         };

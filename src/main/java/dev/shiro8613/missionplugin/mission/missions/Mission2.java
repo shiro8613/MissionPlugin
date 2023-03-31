@@ -70,8 +70,7 @@ public class Mission2 extends Mission{
     }
 
     private void checkMessageCmd(CommandContext ctx) {
-        ctx.getCommandSender().sendMessage(Component.text("1プレイヤーの画像の確認が済んだものとしてマークします。", NamedTextColor.AQUA));
-        getTimerManager().getTimerByName("mission.2.approved_player").tickTimer();
+        ctx.getCommandSender().sendMessage(Component.text("1プレイヤーの画像の確認が済んだものとしてマークします。", NamedTextColor.AQUA)); getTimerManager().getTimerByName("mission.2.approved_player").tickTimer();
         if (getTimerManager().getTimerByName("mission.2.approved_player").isFinished()) {
             onSuccess();
         }
