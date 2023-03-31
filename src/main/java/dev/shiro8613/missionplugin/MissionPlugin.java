@@ -30,7 +30,7 @@ public final class MissionPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         missionManager = new MissionManager(this);
-        missionManager.registers(Mission1.class, Mission2.class, Mission3.class, EndRoll.class);
+        missionManager.registers(Mission1.class, Mission2.class, Mission3.class, Mission4.class, EndRoll.class);
 
     }
 
