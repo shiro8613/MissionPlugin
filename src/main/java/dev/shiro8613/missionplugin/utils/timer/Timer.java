@@ -34,6 +34,14 @@ public abstract class Timer {
     protected int tickProgress;
     private final int tickGoal;
     private final TimerEnum mode;
+    /**
+     * 接頭辞
+     */
+    private String prefix = "";
+    /**
+     * 接尾辞
+     */
+    private String suffix = "";
     public Timer(int goal, TimerEnum mode, BarColor barColor, BarStyle barStyle, @Nullable BarFlag... barFlags) {
         this.bar = Bukkit.createBossBar("", barColor, barStyle, barFlags);
         this.tickGoal = goal;
@@ -121,5 +129,37 @@ public abstract class Timer {
      */
     public TimerEnum getMode() {
         return mode;
+    }
+
+    /**
+     * 接尾辞を取得します。
+     * @return 接頭辞
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /**
+     * 接頭辞を設定します
+     * @param prefix 接頭辞
+     */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    /**
+     * 接尾辞を取得します。
+     * @return 接尾辞
+     */
+    public String getSuffix() {
+        return suffix;
+    }
+
+    /**
+     * 接尾辞を設定します。
+     * @param suffix 接尾辞
+     */
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 }

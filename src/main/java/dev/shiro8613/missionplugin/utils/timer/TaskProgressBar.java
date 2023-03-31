@@ -14,6 +14,8 @@ public class TaskProgressBar extends Timer {
         this.tickProgress = 0;
         this.updateRemainingTime();
         this.bar.setProgress(0);
+        this.setPrefix("ミッション完了まであと ");
+        this.setSuffix("人");
     }
 
     @Override
@@ -23,6 +25,16 @@ public class TaskProgressBar extends Timer {
         return super.tickTimer();
     }
 
+    public double setCurrent(int i) {
+        if (i > this.getTickGoal() || i < 0) {
+            return this.getProgress();
+        } else {
+            this.tickProgress = i;
+            this.updateRemainingTime();
+            return super.tickTimer();
+        }
+    }
+
     @Override
     public boolean isFinished() {
         return this.getTickGoal() == this.tickProgress;
@@ -30,7 +42,7 @@ public class TaskProgressBar extends Timer {
 
     @Override
     protected void updateRemainingTime() {
-        var text = String.format("ミッション完了まであと %d人", this.getTickGoal() - this.tickProgress);
+        var text = String.format("%s%d%s", this.getPrefix(), this.getTickGoal() - this.tickProgress, this.getSuffix());
         this.bar.setTitle(text);
     }
 }
