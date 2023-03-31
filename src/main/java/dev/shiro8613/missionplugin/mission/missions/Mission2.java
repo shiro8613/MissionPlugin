@@ -27,6 +27,7 @@ public class Mission2 extends Mission{
 
     private enum MissionState {Start, OnGoing, End}
     private List<Player> challengers = null;
+    private List<Player> nonHunters = null;
     private final ItemStack reward = new ItemStack(Material.AIR);
     private MissionState state = MissionState.Start;
     private int timeLimit = 6*Timer.TICKS_1_MIN;
@@ -35,14 +36,15 @@ public class Mission2 extends Mission{
     @Override
     public void Init() {
         challengers = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("challenger") != null).toList();
+        nonHunters = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("hunter") == null).toList();
 
         greet();
         // 雑に作ったTimerを使ってみる
         getTimerManager().createTimer("mission.2.find_shiratama", TimerEnum.CountDown, timeLimit, BarColor.BLUE, BarStyle.SOLID);
         getTimerManager().createTimer("mission.2.approved_player", TimerEnum.TaskProgress, requiredChecks, BarColor.GREEN, BarStyle.SEGMENTED_10);
         // 複数はsetSubscribersが便利です
-        getTimerManager().getTimerByName("mission.2.find_shiratama").setSubscribers(challengers);
-        getTimerManager().getTimerByName("mission.2.approved_player").setSubscribers(challengers);
+        getTimerManager().getTimerByName("mission.2.find_shiratama").setSubscribers(nonHunters);
+        getTimerManager().getTimerByName("mission.2.approved_player").setSubscribers(nonHunters);
         getTimerManager().getTimerByName("mission.2.find_shiratama").setVisibility(true);
         getTimerManager().getTimerByName("mission.2.approved_player").setVisibility(true);
 
@@ -56,7 +58,6 @@ public class Mission2 extends Mission{
         getTimerManager().getTimerByName("mission.2.find_shiratama").tickTimer();
 
         if (getTimerManager().getTimerByName("mission.2.find_shiratama").isFinished()) {
-            state = MissionState.End;
             onFail();
         }
 
@@ -88,7 +89,7 @@ public class Mission2 extends Mission{
         // ミッション開始通知
         var title = Component.text("ミッション発動: 迷子の、、お知らせです。。。", NamedTextColor.YELLOW);
         var subtitle = Component.text("詳細はチャットを確認してください", NamedTextColor.GRAY, TextDecoration.ITALIC);
-        challengers.forEach(p -> {
+        nonHunters.forEach(p -> {
             p.showTitle(Title.title(title, subtitle));
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, Sound.Source.PLAYER, 1.0f, 1.0f));
 
@@ -107,8 +108,8 @@ public class Mission2 extends Mission{
         state = MissionState.End;
         final var successTitle = Component.text("ミッション成功", NamedTextColor.GREEN);
         final var successSubTitle = Component.text("ミッションに成功したため、逃走者全員に報酬が配布されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
-        challengers.forEach(p -> {
-            p.getInventory().addItem(reward);
+        challengers.forEach(p -> p.getInventory().addItem(reward));
+        nonHunters.forEach(p -> {
             p.showTitle(Title.title(successTitle, successSubTitle));
             p.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Sound.Source.HOSTILE, 1f, 1.1f));
         });
@@ -130,6 +131,7 @@ public class Mission2 extends Mission{
 
 */
         // ゲームオーバーの場合
+        state = MissionState.End;
         final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
         final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
         var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC*10, 1);
