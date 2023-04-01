@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.FaceAttachable;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -31,6 +32,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,6 +49,7 @@ public class Mission3 extends Mission {
     private final ItemStack reward = new ItemStack(Material.AIR);
     private int timeLimit;
     private List<Player> challengers = null;
+    private List<Location> pushed_button = new ArrayList<Location>();
     private MissionState state = MissionState.Start;
     private final int requiredChecks = 5;
     private Location buttonLocation;
@@ -68,9 +71,21 @@ public class Mission3 extends Mission {
             if (Objects.requireNonNull(block).getType().equals(Material.STONE_BUTTON)) {
                 //1,1,1は座標
                 if (block.getLocation().equals(buttonLocation)) {
-                    //処理
-                    // 石のボタンを消す処置：ボタンが凹んでる時にもう一回押さないと反映しない
+                    playerInteractEvent.setCancelled(true);
+                    player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
                     removeStoneButton(buttonLocation);
+
+                    /*
+                    //処理
+                    if (pushed_button.contains(buttonLocation)) {
+                        player.sendMessage("このボタンは押されてます！違うボタンを探してください！");
+                    }
+                    else {
+                        player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
+                        // 押下済みのボタン登録
+                        pushed_button.add(buttonLocation);
+                    }
+                    */
                 }
             }
         });
@@ -137,13 +152,34 @@ public class Mission3 extends Mission {
     public void spawnStoneButton(Location location) {
         Block buttonBlock = location.getBlock().getRelative(BlockFace.UP); // 上向きの石のボタンを作成するためにブロックの上の位置を取得する
         buttonBlock.setType(Material.STONE_BUTTON); // ブロックを石のボタンに設定
+        rotateButtonUp(buttonBlock);
     }
 
     // 石のボタンを座標指定で消す関数
     public void removeStoneButton(Location location) {
-        Block block = location.getWorld().getBlockAt(location);
+        Block block = location.getBlock();
         block.setType(Material.AIR);
+        player.sendMessage(String.valueOf(block.getType()));
         player.sendMessage("ボタンを消去!");
+    }
+
+    // 石のボタンを上方向に回転させるメソッド
+    public void rotateButtonUp(Block buttonBlock) {
+        if (buttonBlock.getType() != Material.STONE_BUTTON) {
+            return;
+        }
+
+        BlockData buttonData = buttonBlock.getBlockData();
+        if (!(buttonData instanceof Directional)) {
+            return;
+        }
+
+        Directional directional = (Directional) buttonData;
+        BlockFace currentFacing = directional.getFacing();
+        BlockFace newFacing = BlockFace.NORTH;
+
+        directional.setFacing(newFacing);
+        buttonBlock.setBlockData(directional);
     }
 
 }
