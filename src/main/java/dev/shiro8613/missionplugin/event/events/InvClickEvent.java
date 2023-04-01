@@ -4,11 +4,11 @@ import dev.shiro8613.missionplugin.event.Event;
 import dev.shiro8613.missionplugin.event.EventEnum;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 
-public class CloseEvent extends Event implements Listener {
+public class InvClickEvent extends Event implements Listener {
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        onEvent(EventEnum.InventoryCloseEvent, event);
+    public void onInvClick(InventoryClickEvent event) {
+        onEvent(EventEnum.InventoryClickEvent, event);
     }
 }
