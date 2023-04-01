@@ -51,6 +51,7 @@ public class Mission3 extends Mission {
         player = getPlayers().get(0); timeLimit = 5*Timer.TICKS_1_MIN;
         buttonLocation = new Location(getServer().getWorld("world"), 0, 63, 11);
         spawnStoneButton(buttonLocation);
+        buttonLocation.setY(buttonLocation.getY()+1);
 
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
@@ -58,7 +59,7 @@ public class Mission3 extends Mission {
             if(Objects.requireNonNull(block).getType().equals(Material.STONE_BUTTON)) {
                 Location location = block.getLocation();
                 //1,1,1は座標
-                if(location.equals(new Location(block.getWorld(), 0, 64,11))) {
+                if(location.equals(buttonLocation)) {
                     //処理
                     player.sendMessage("OK");
                 }
