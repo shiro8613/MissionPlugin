@@ -12,7 +12,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -30,33 +33,26 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class Mission1 extends Mission {
 
     private final int timeLimit = Timer.TICKS_1_MIN * 3;
-    public enum MissionState {Setup, Ready, OnGoing, End}
     private final List<Block> triggers = new ArrayList<>();
+    private final int triggerCount = 4;
+    private final ItemStack reward = new ItemStack(Material.SPLASH_POTION);
+    private final Map<Block, Player> checking = new HashMap<>();
     private List<Player> challengers;
     private List<Player> nonHunters;
     private MissionState state;
-    private final int triggerCount = 4;
     private Location rewardPos = null;
-    private final ItemStack reward = new ItemStack(Material.SPLASH_POTION);
-    private final Map<Block, Player> checking = new HashMap<>();
+
     @Override
     public void Init() {
         state = MissionState.Setup;
         onStateChange();
         getEventManager().registerEventHandler(EventEnum.ClickEvent, this::onPressed);
-
-        triggers.clear();
-        rewardPos = null;
-        checking.clear();
 
         challengers = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("challenger") != null).toList();
         nonHunters = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("hunter") == null).toList();
@@ -73,7 +69,7 @@ public class Mission1 extends Mission {
         var pm = (PotionMeta) reward.getItemMeta();
         pm.setBasePotionData(new PotionData(PotionType.WATER));
         pm.displayName(Component.translatable("item.minecraft.potion.effect.slowness").color(NamedTextColor.AQUA));
-        pm.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 5*Timer.TICKS_1_SEC,6, false, true, true), true);
+        pm.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 5 * Timer.TICKS_1_SEC, 6, false, true, true), true);
         reward.setItemMeta(pm);
         reward.setAmount(1);
     }
@@ -104,6 +100,7 @@ public class Mission1 extends Mission {
             }
         }
     }
+
     public void setRewardPosCmd(CommandContext ctx) {
         if (ctx.getCommandSender() instanceof ConsoleCommandSender) {
             ctx.getCommandSender().sendMessage(Component.text("このコマンドはプレイヤーで実行してください", NamedTextColor.RED));
@@ -186,7 +183,7 @@ public class Mission1 extends Mission {
                     // ミッション失敗
                     final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
                     final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
-                    var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC*10, 1);
+                    var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
                     challengers.forEach(p -> p.addPotionEffect(deBuff));
                     nonHunters.forEach(p -> {
                         p.showTitle(Title.title(failTitle, failSubTitle));
@@ -216,7 +213,7 @@ public class Mission1 extends Mission {
 
     public void onPressed(EventContext ctx) {
         var event = (PlayerInteractEvent) ctx.getEvent(EventEnum.ClickEvent);
-        if (event.getAction() == Action.PHYSICAL && event.getClickedBlock().getType() == Material.STONE_PRESSURE_PLATE && triggers.stream().anyMatch(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))) {
+        if (event.getAction() == Action.PHYSICAL && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.STONE_PRESSURE_PLATE && triggers.stream().anyMatch(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))) {
             checking.put(event.getClickedBlock(), event.getPlayer());
         }
     }
@@ -231,10 +228,10 @@ public class Mission1 extends Mission {
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, Sound.Source.PLAYER, 1.0f, 1.0f));
 
             // チャットに詳細を表示
-            p.sendMessage(Component.text("キッザニアにある時計台に四人で集合せよ！",NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
-            p.sendMessage(Component.text("時計台に設置された",NamedTextColor.YELLOW).append(Component.text("感圧版", NamedTextColor.GRAY)).append(Component.text("4つを", NamedTextColor.YELLOW)).append(Component.text("同時に", NamedTextColor.GOLD, TextDecoration.UNDERLINED)).append(Component.text("踏み、アイテムをゲットしよう。", NamedTextColor.YELLOW)));
-            p.sendMessage(Component.text("制限時間は3分。",NamedTextColor.YELLOW));
-            p.sendMessage(Component.text("ミッションが達成できなければ、",NamedTextColor.YELLOW).append(Component.text("逃走者全員が10秒間発光する", NamedTextColor.RED, TextDecoration.UNDERLINED)).append(Component.text("！", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("キッザニアにある時計台に四人で集合せよ！", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
+            p.sendMessage(Component.text("時計台に設置された", NamedTextColor.YELLOW).append(Component.text("感圧版", NamedTextColor.GRAY)).append(Component.text("4つを", NamedTextColor.YELLOW)).append(Component.text("同時に", NamedTextColor.GOLD, TextDecoration.UNDERLINED)).append(Component.text("踏み、アイテムをゲットしよう。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("制限時間は3分。", NamedTextColor.YELLOW));
+            p.sendMessage(Component.text("ミッションが達成できなければ、", NamedTextColor.YELLOW).append(Component.text("逃走者全員が10秒間発光する", NamedTextColor.RED, TextDecoration.UNDERLINED)).append(Component.text("！", NamedTextColor.YELLOW)));
         });
     }
 
@@ -262,8 +259,8 @@ public class Mission1 extends Mission {
         // 感圧版の監視
         var released = new ArrayList<Block>();
         checking.forEach((b, p) -> {
-            var delta = p.getLocation().subtract(b.getLocation().add(0.5d, 1d/32, 0.5d));
-            if (Math.abs(delta.x()) > 0.8d - (1d/16) || Math.abs(delta.z()) > 0.8d - (1d/16) || Math.abs(delta.y()) > 1d/8) {
+            var delta = p.getLocation().subtract(b.getLocation().add(0.5d, 1d / 32, 0.5d));
+            if (Math.abs(delta.x()) > 0.8d - (1d / 16) || Math.abs(delta.z()) > 0.8d - (1d / 16) || Math.abs(delta.y()) > 1d / 8) {
                 var bd = (Powerable) b.getBlockData();
                 bd.setPowered(false);
                 b.setBlockData(bd);
@@ -284,9 +281,21 @@ public class Mission1 extends Mission {
 
     @Override
     public void onDisable() {
+        // タイマー破棄
         getTimerManager().discardTimerByName("mission.1.come_on");
         getTimerManager().discardTimerByName("mission.1.reached");
+
+        getEventManager().removeAll();
+
+        // お掃除
         triggers.forEach(b -> b.setType(Material.AIR));
+        triggers.clear();
+        challengers.clear();
+        nonHunters.clear();
+        rewardPos = null;
+        checking.clear();
     }
+
+    public enum MissionState {Setup, Ready, OnGoing, End}
 
 }
