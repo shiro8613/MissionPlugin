@@ -2,6 +2,7 @@ package dev.shiro8613.missionplugin.event;
 
 import dev.shiro8613.missionplugin.event.events.ChatEvent;
 import dev.shiro8613.missionplugin.event.events.ClickEvent;
+import dev.shiro8613.missionplugin.event.events.CloseEvent;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,7 +18,7 @@ public class EventManager {
     }
 
     public EventManager(JavaPlugin plugin) {
-        registerAssist(plugin, new ClickEvent(), new ChatEvent());
+        registerAssist(plugin, new ClickEvent(), new ChatEvent(), new CloseEvent());
     }
 
     private void registerAssist(JavaPlugin plugin, Listener... listeners) {
