@@ -4,13 +4,13 @@ import dev.shiro8613.missionplugin.command.CommandContext;
 import dev.shiro8613.missionplugin.mission.Mission;
 import dev.shiro8613.missionplugin.utils.timer.Timer;
 import dev.shiro8613.missionplugin.utils.timer.TimerEnum;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
-import net.kyori.adventure.sound.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
@@ -23,20 +23,21 @@ import org.bukkit.potion.PotionType;
 
 import java.util.List;
 
-public class Mission2 extends Mission{
+import static dev.shiro8613.missionplugin.mission.missions.Mission1.testTeam;
 
-    private enum MissionState {Start, OnGoing, End}
+public class Mission2 extends Mission {
+
+    private final ItemStack reward = new ItemStack(Material.AIR);
+    private final int requiredChecks = 5;
     private List<Player> challengers = null;
     private List<Player> nonHunters = null;
-    private final ItemStack reward = new ItemStack(Material.AIR);
     private MissionState state = MissionState.Start;
-    private int timeLimit = 6*Timer.TICKS_1_MIN;
-    private final int requiredChecks = 5;
+    private int timeLimit = 6 * Timer.TICKS_1_MIN;
 
     @Override
     public void Init() {
-        challengers = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("challenger") != null).toList();
-        nonHunters = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("hunter") == null).toList();
+        challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
 
         greet();
         // 雑に作ったTimerを使ってみる
@@ -62,7 +63,7 @@ public class Mission2 extends Mission{
         }
 
         if (state == MissionState.End) {
-            challengers.forEach(p ->p.sendMessage("ミッションを終了します"));
+            challengers.forEach(p -> p.sendMessage("ミッションを終了します"));
             // ここのメソッド動かない！！
             // そんな時代も414fdac919775820ce5dc2582d04c2b39dd34be1より前にはありました...
             missionEnd();
@@ -70,7 +71,8 @@ public class Mission2 extends Mission{
     }
 
     private void checkMessageCmd(CommandContext ctx) {
-        ctx.getCommandSender().sendMessage(Component.text("1プレイヤーの画像の確認が済んだものとしてマークします。", NamedTextColor.AQUA)); getTimerManager().getTimerByName("mission.2.approved_player").tickTimer();
+        ctx.getCommandSender().sendMessage(Component.text("1プレイヤーの画像の確認が済んだものとしてマークします。", NamedTextColor.AQUA));
+        getTimerManager().getTimerByName("mission.2.approved_player").tickTimer();
         if (getTimerManager().getTimerByName("mission.2.approved_player").isFinished()) {
             onSuccess();
         }
@@ -82,7 +84,7 @@ public class Mission2 extends Mission{
         var pm = (PotionMeta) reward.getItemMeta();
         pm.setBasePotionData(new PotionData(PotionType.WATER));
         pm.displayName(Component.translatable("item.minecraft.potion.effect.swiftness").color(NamedTextColor.AQUA));
-        pm.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 10*Timer.TICKS_1_SEC,3, false, true, true), true);
+        pm.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 10 * Timer.TICKS_1_SEC, 3, false, true, true), true);
         reward.setItemMeta(pm);
 
         // ミッション開始通知
@@ -93,13 +95,13 @@ public class Mission2 extends Mission{
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, Sound.Source.PLAYER, 1.0f, 1.0f));
 
             // チャットに詳細を表示
-            p.sendMessage(Component.text("迷子のお知らせです。",NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
-            p.sendMessage(Component.text("ピンクのスカート",NamedTextColor.LIGHT_PURPLE).append(Component.text("を着て、サングラスを掛けた、", NamedTextColor.YELLOW)).append(Component.text("白玉のような女の子", NamedTextColor.WHITE)).append(Component.text("を探しています。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("迷子のお知らせです。", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
+            p.sendMessage(Component.text("ピンクのスカート", NamedTextColor.LIGHT_PURPLE).append(Component.text("を着て、サングラスを掛けた、", NamedTextColor.YELLOW)).append(Component.text("白玉のような女の子", NamedTextColor.WHITE)).append(Component.text("を探しています。", NamedTextColor.YELLOW)));
             // TODO: 使用時はリンク先を正しいものに変更するかリンクを開く機能を削除してください。
-            p.sendMessage(Component.text("もし見つけましたらその子と一緒に写真を撮り、写真を",NamedTextColor.YELLOW).append(Component.text("Discordの『#逃走中ミッション』チャンネル", NamedTextColor.GOLD)).clickEvent(ClickEvent.openUrl("https://discord.com/channels/1046066805552189440/1080796750303997973")).hoverEvent(Component.text("クリックするとWebブラウザで開きます")).append(Component.text("にお貼りください。", NamedTextColor.YELLOW)));
-            p.sendMessage(Component.text("5人の逃走者が写真を貼ることができれば",NamedTextColor.YELLOW).append(Component.text("ミッション成功", NamedTextColor.GREEN)).append(Component.text("です。", NamedTextColor.YELLOW)));
-            p.sendMessage(Component.text("全員に",NamedTextColor.YELLOW).append(reward.displayName().color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true)).append(Component.text("をお渡しします。")));
-            p.sendMessage(Component.text("もし制限時間内に達成できなければ、",NamedTextColor.YELLOW).append(Component.text("逃走者全員が10秒間発光します", NamedTextColor.RED, TextDecoration.UNDERLINED)).append(Component.text("。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("もし見つけましたらその子と一緒に写真を撮り、写真を", NamedTextColor.YELLOW).append(Component.text("Discordの『#逃走中ミッション』チャンネル", NamedTextColor.GOLD)).clickEvent(ClickEvent.openUrl("https://discord.com/channels/1046066805552189440/1080796750303997973")).hoverEvent(Component.text("クリックするとWebブラウザで開きます")).append(Component.text("にお貼りください。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("5人の逃走者が写真を貼ることができれば", NamedTextColor.YELLOW).append(Component.text("ミッション成功", NamedTextColor.GREEN)).append(Component.text("です。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("全員に", NamedTextColor.YELLOW).append(reward.displayName().color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true)).append(Component.text("をお渡しします。")));
+            p.sendMessage(Component.text("もし制限時間内に達成できなければ、", NamedTextColor.YELLOW).append(Component.text("逃走者全員が10秒間発光します", NamedTextColor.RED, TextDecoration.UNDERLINED)).append(Component.text("。", NamedTextColor.YELLOW)));
         });
     }
 
@@ -113,12 +115,13 @@ public class Mission2 extends Mission{
             p.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Sound.Source.HOSTILE, 1f, 1.1f));
         });
     }
+
     public void onFail() {
         // ゲームオーバーの場合
         state = MissionState.End;
         final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
         final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
-        var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC*10, 1);
+        var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
         challengers.forEach(p -> p.addPotionEffect(deBuff));
         nonHunters.forEach(p -> {
             p.showTitle(Title.title(failTitle, failSubTitle));
@@ -132,4 +135,6 @@ public class Mission2 extends Mission{
         getTimerManager().discardTimerByName("mission.2.approved_player");
         getCommandManager().removeAll();
     }
+
+    private enum MissionState {Start, OnGoing, End}
 }

@@ -28,13 +28,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.checkerframework.checker.units.qual.N;
 
 import java.util.*;
-import java.util.stream.Stream;
+
+import static dev.shiro8613.missionplugin.mission.missions.Mission1.testTeam;
 
 public class Mission4 extends Mission {
 
+    private final int timeLimit = 3 * Timer.TICKS_1_MIN;
+    private final String timerName = "mission.4.otukai";
+    private final ItemStack pickedItem = new ItemStack(Material.APPLE);
+    private final ItemStack giveItem = new ItemStack(Material.LEATHER_BOOTS);
+    private final List<InventoryAction> placeActions = Arrays.asList(InventoryAction.PLACE_SOME, InventoryAction.PLACE_ALL, InventoryAction.PLACE_ONE);
     private List<Player> nonHunters = null;
     private List<Player> challenger = null;
     private Map<Player, Boolean> markingPlayer = null;
@@ -44,18 +49,14 @@ public class Mission4 extends Mission {
     private ArmorStand momArmor = null;
     private MissionState state = null;
     private Player successPlayer = null;
-    private final int timeLimit = 3 * Timer.TICKS_1_MIN;
-    private final String timerName = "mission.4.otukai";
-    private final ItemStack pickedItem = new ItemStack(Material.APPLE);
-    private final ItemStack giveItem = new ItemStack(Material.LEATHER_BOOTS);
-    private final List<InventoryAction> placeActions = Arrays.asList(InventoryAction.PLACE_SOME, InventoryAction.PLACE_ALL, InventoryAction.PLACE_ONE);
+
     @Override
     public void Init() {
         state = MissionState.Setup;
         onStateChange();
 
-        nonHunters = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("hunter") == null).toList();
-        challenger = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("challenger") != null).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
+        challenger = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
 
         getTimerManager().createTimer(timerName, TimerEnum.CountDown, timeLimit, BarColor.BLUE, BarStyle.SOLID);
         getTimerManager().getTimerByName(timerName).setSubscribers(nonHunters);
@@ -73,26 +74,26 @@ public class Mission4 extends Mission {
 
         getTimerManager().getTimerByName(timerName).tickTimer();
 
-       markingPlayer.forEach(((player, aBoolean) -> {
-           if (aBoolean) {
-               if (!box.getInventory().contains(giveItem)) {
-                   if(player.getInventory().contains(giveItem)) {
-                       successPlayer = player;
-                   } else {
-                       challenger.forEach(p -> {
-                           if(p.getInventory().contains(giveItem)) {
-                               p.sendMessage(Component.text("盗んじゃダメでしょ！", NamedTextColor.YELLOW));
-                               p.sendMessage(Component.text("ぼっしゅ～", NamedTextColor.YELLOW));
-                               p.getInventory().remove(giveItem);
-                               box.getInventory().setItem(1, giveItem);
-                           }
-                       });
-                   }
-               }
-           }
-       }));
+        markingPlayer.forEach(((player, aBoolean) -> {
+            if (aBoolean) {
+                if (!box.getInventory().contains(giveItem)) {
+                    if (player.getInventory().contains(giveItem)) {
+                        successPlayer = player;
+                    } else {
+                        challenger.forEach(p -> {
+                            if (p.getInventory().contains(giveItem)) {
+                                p.sendMessage(Component.text("盗んじゃダメでしょ！", NamedTextColor.YELLOW));
+                                p.sendMessage(Component.text("ぼっしゅ～", NamedTextColor.YELLOW));
+                                p.getInventory().remove(giveItem);
+                                box.getInventory().setItem(1, giveItem);
+                            }
+                        });
+                    }
+                }
+            }
+        }));
 
-        if(getTimerManager().getTimerByName(timerName).isFinished() || successPlayer != null) {
+        if (getTimerManager().getTimerByName(timerName).isFinished() || successPlayer != null) {
             state = MissionState.End;
             onStateChange();
         }
@@ -102,7 +103,7 @@ public class Mission4 extends Mission {
         PlayerInteractEvent event = eventContext.getEvent(EventEnum.ClickEvent);
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        if(Objects.requireNonNull(block).getType().equals(Material.SHULKER_BOX) && block.getLocation().equals(box.getLocation())) {
+        if (Objects.requireNonNull(block).getType().equals(Material.SHULKER_BOX) && block.getLocation().equals(box.getLocation())) {
             if (player.getInventory().contains(pickedItem)) {
                 markingPlayer.putIfAbsent(player, false);
             }
@@ -113,7 +114,7 @@ public class Mission4 extends Mission {
         InventoryClickEvent event = eventContext.getEvent(EventEnum.InventoryClickEvent);
         Player player = (Player) event.getWhoClicked();
         InventoryAction action = event.getAction();
-        if(placeActions.contains(action)) {
+        if (placeActions.contains(action)) {
             if (Objects.requireNonNull(event.getCursor()).equals(pickedItem)) {
                 if (markingPlayer.containsKey(player)) {
                     box.getInventory().clear();
@@ -145,9 +146,9 @@ public class Mission4 extends Mission {
                 ((Player) ctx.getCommandSender()).spawnParticle(Particle.REDSTONE, tmpPresPlate.getLocation().add(0.5d, 0.2d, 0.5), 15, new Particle.DustOptions(Color.LIME, 1.0f));
 
                 BlockFace face = ((Player) ctx.getCommandSender()).getFacing();
-                if(face.equals(BlockFace.NORTH) || face.equals(BlockFace.SOUTH)) {
+                if (face.equals(BlockFace.NORTH) || face.equals(BlockFace.SOUTH)) {
                     momPos = new Location(rewardPos.getWorld(), rewardPos.getX() + 1.5, rewardPos.getY() + 1, rewardPos.getZ());
-                } else if(face.equals(BlockFace.WEST) || face.equals(BlockFace.EAST)) {
+                } else if (face.equals(BlockFace.WEST) || face.equals(BlockFace.EAST)) {
                     momPos = new Location(rewardPos.getWorld(), rewardPos.getX(), rewardPos.getY() + 1, rewardPos.getZ() + 1.5);
                 }
 
@@ -183,7 +184,7 @@ public class Mission4 extends Mission {
         });
     }
 
-    private void checkReady(CommandContext ctx){
+    private void checkReady(CommandContext ctx) {
         if (rewardPos != null) {
             ctx.getCommandSender().sendMessage(Component.text("ミッションの設定が完了しました。ミッションを開始可能です。", NamedTextColor.GREEN));
             state = MissionState.Ready;
@@ -217,7 +218,7 @@ public class Mission4 extends Mission {
                 greet();
             }
             case End -> {
-                if(getTimerManager().getTimerByName(timerName).isFinished() && successPlayer == null){
+                if (getTimerManager().getTimerByName(timerName).isFinished() && successPlayer == null) {
                     Component failTitle = Component.text("ミッション失敗", NamedTextColor.YELLOW);
                     Component failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に盲目エフェクトが付与されました", NamedTextColor.YELLOW);
                     nonHunters.forEach(player -> {
@@ -231,18 +232,18 @@ public class Mission4 extends Mission {
 
                     nonHunters.forEach(player -> {
                         player.sendMessage(Component.text(successPlayer.getName(), NamedTextColor.AQUA)
-                            .append(Component.text("さんがミッションにクリアしました")));
+                                .append(Component.text("さんがミッションにクリアしました")));
                         player.showTitle(Title.title(successTitle, successSubTitle));
                         player.playSound(Sound.sound(org.bukkit.Sound.UI_TOAST_CHALLENGE_COMPLETE, Sound.Source.HOSTILE, 1f, 1.1f));
                     });
                     successPlayer.sendMessage(Component.text("あなたはミッションにクリアしました", NamedTextColor.YELLOW));
-                    successPlayer.sendMessage(Component.text("報酬のブーツにより、",NamedTextColor.YELLOW)
-                            .append(Component.text("-51 -59 30",NamedTextColor.AQUA))
-                            .append(Component.text("地点にある",NamedTextColor.YELLOW)));
+                    successPlayer.sendMessage(Component.text("報酬のブーツにより、", NamedTextColor.YELLOW)
+                            .append(Component.text("-51 -59 30", NamedTextColor.AQUA))
+                            .append(Component.text("地点にある", NamedTextColor.YELLOW)));
                     successPlayer.sendMessage(Component.text("冷房室に入ることができるようになりました", NamedTextColor.YELLOW));
-                    successPlayer.sendMessage(Component.text("そこには何か",NamedTextColor.YELLOW)
+                    successPlayer.sendMessage(Component.text("そこには何か", NamedTextColor.YELLOW)
                             .append(Component.text("特別なアイテム", NamedTextColor.GOLD))
-                            .append(Component.text("があるとか、ないとか...",NamedTextColor.YELLOW)));
+                            .append(Component.text("があるとか、ないとか...", NamedTextColor.YELLOW)));
                 }
 
                 box.getBlock().setType(Material.AIR);
@@ -269,5 +270,5 @@ public class Mission4 extends Mission {
         successPlayer = null;
 
     }
-    private enum MissionState {Setup, Ready, OnGoing, End};
+    private enum MissionState {Setup, Ready, OnGoing, End}
 }

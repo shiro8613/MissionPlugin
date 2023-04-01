@@ -83,7 +83,7 @@ public class CommandManager {
 
                 case 2 -> {
                     if(args[0].equalsIgnoreCase("start")) {
-                        for (int i = 0; i <= missionManager.getMissionNames().size(); i++) {
+                        for (int i = 0; i < missionManager.getMissionNames().size(); i++) {
                             argResponse.add(Integer.toString(i));
                         }
                         return argResponse;

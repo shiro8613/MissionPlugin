@@ -48,14 +48,19 @@ public class Mission1 extends Mission {
     private MissionState state;
     private Location rewardPos = null;
 
+    public static boolean testTeam(Player p, String team) {
+        var t = p.getScoreboard().getTeam(team);
+        return t != null && t.hasPlayer(p);
+    }
+
     @Override
     public void Init() {
         state = MissionState.Setup;
         onStateChange();
         getEventManager().registerEventHandler(EventEnum.ClickEvent, this::onPressed);
 
-        challengers = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("challenger") != null).toList();
-        nonHunters = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("hunter") == null).toList();
+        challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
 
         getTimerManager().createTimer("mission.1.come_on", TimerEnum.CountDown, timeLimit, BarColor.BLUE, BarStyle.SOLID);
         getTimerManager().createTimer("mission.1.reached", TimerEnum.TaskProgress, triggerCount, BarColor.GREEN, BarStyle.SEGMENTED_12);
@@ -161,7 +166,7 @@ public class Mission1 extends Mission {
         getCommandManager().removeAll();
         switch (state) {
             case Setup -> {
-                getCommandManager().addCmd("addTrigger", this::addTriggerCmd);
+                if (triggers.size() < triggerCount) getCommandManager().addCmd("addTrigger", this::addTriggerCmd);
                 getCommandManager().addCmd("resetTrigger", this::resetTriggerCmd);
                 getCommandManager().addCmd("setRewardPos", this::setRewardPosCmd);
                 getCommandManager().addCmd("showTriggers", this::showTriggerCmd);
@@ -213,8 +218,10 @@ public class Mission1 extends Mission {
 
     public void onPressed(EventContext ctx) {
         var event = (PlayerInteractEvent) ctx.getEvent(EventEnum.ClickEvent);
-        if (event.getAction() == Action.PHYSICAL && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.STONE_PRESSURE_PLATE && triggers.stream().anyMatch(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))) {
-            checking.put(event.getClickedBlock(), event.getPlayer());
+        if (challengers.contains(event.getPlayer())) {
+            if (event.getAction() == Action.PHYSICAL && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.STONE_PRESSURE_PLATE && triggers.stream().anyMatch(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))) {
+                checking.put(event.getClickedBlock(), event.getPlayer());
+            }
         }
     }
 
@@ -246,7 +253,7 @@ public class Mission1 extends Mission {
         }
         if (triggers.size() != triggerCount) {
             ctx.getCommandSender().sendMessage(Component.text(String.format("ミッションを開始するにはトリガをあと%d箇所指定する必要があります。", triggerCount - triggers.size()), NamedTextColor.RED));
-        }
+        } else onStateChange();
     }
 
     @Override
@@ -259,8 +266,8 @@ public class Mission1 extends Mission {
         // 感圧版の監視
         var released = new ArrayList<Block>();
         checking.forEach((b, p) -> {
-            var delta = p.getLocation().subtract(b.getLocation().add(0.5d, 1d / 32, 0.5d));
-            if (Math.abs(delta.x()) > 0.8d - (1d / 16) || Math.abs(delta.z()) > 0.8d - (1d / 16) || Math.abs(delta.y()) > 1d / 8) {
+            var delta = p.getLocation().subtract(b.getLocation().add(0.5d, 0, 0.5d));
+            if (Math.abs(delta.x()) >= 0.8d - (1d / 16) || Math.abs(delta.z()) >= 0.8d - (1d / 16) || delta.y() >= 1d / 4 || delta.y() < 0) {
                 var bd = (Powerable) b.getBlockData();
                 bd.setPowered(false);
                 b.setBlockData(bd);
@@ -290,8 +297,6 @@ public class Mission1 extends Mission {
         // お掃除
         triggers.forEach(b -> b.setType(Material.AIR));
         triggers.clear();
-        challengers.clear();
-        nonHunters.clear();
         rewardPos = null;
         checking.clear();
     }

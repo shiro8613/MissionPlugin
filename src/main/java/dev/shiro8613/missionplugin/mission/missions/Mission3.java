@@ -12,12 +12,10 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
-import org.bukkit.block.data.FaceAttachable;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -25,8 +23,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.material.Button;
-import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -36,28 +32,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static dev.shiro8613.missionplugin.mission.missions.Mission1.testTeam;
 import static org.bukkit.Bukkit.getServer;
 
 
 public class Mission3 extends Mission {
-    private Player player = null;
-    private List<Player> nonHunters = null;
-
-    private enum MissionState {Start, OnGoing, End}
-
     private final BossBar bar = Bukkit.createBossBar("残り時間:", BarColor.YELLOW, BarStyle.SOLID);
     private final ItemStack reward = new ItemStack(Material.AIR);
+    private final int requiredChecks = 5;
+    private Player player = null;
+    private List<Player> nonHunters = null;
     private int timeLimit;
     private List<Player> challengers = null;
     private List<Location> pushed_button = new ArrayList<Location>();
     private MissionState state = MissionState.Start;
-    private final int requiredChecks = 5;
     private Location buttonLocation;
 
     @Override
     public void Init() {
-        challengers = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("challenger") != null).toList();
-        nonHunters = getPlayers().stream().filter(p -> p.getScoreboard().getTeam("hunter") == null).toList();
+        challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
         state = MissionState.OnGoing;
         player = getPlayers().get(0);
         timeLimit = 5 * Timer.TICKS_1_MIN;
@@ -181,5 +175,7 @@ public class Mission3 extends Mission {
         directional.setFacing(newFacing);
         buttonBlock.setBlockData(directional);
     }
+
+    private enum MissionState {Start, OnGoing, End}
 
 }
