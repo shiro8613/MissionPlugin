@@ -50,6 +50,7 @@ public class CommandManager {
 
 
     private boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if(args.length < 1) return false;
         CommandHandler commandHandler = firstCommandList.get(args[0]);
         if(commandHandler == null) {
             sender.sendMessage("コマンドがありません");
@@ -82,7 +83,7 @@ public class CommandManager {
 
                 case 2 -> {
                     if(args[0].equalsIgnoreCase("start")) {
-                        for (int i = 0; i <= missionManager.getMissionNames().length; i++) {
+                        for (int i = 0; i <= missionManager.getMissionNames().size(); i++) {
                             argResponse.add(Integer.toString(i));
                         }
                         return argResponse;

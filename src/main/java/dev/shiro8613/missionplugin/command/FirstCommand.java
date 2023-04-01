@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FirstCommand {
@@ -31,10 +32,13 @@ public class FirstCommand {
             String[] args = context.getArgs();
             CommandSender commandSender = context.getCommandSender();
 
-            if(args.length < 1) commandSender.sendMessage("コマンドミスってるよ");
+            if(args.length < 1) {
+                commandSender.sendMessage("コマンドミスってるよ");
+                return;
+            }
             int index = Integer.parseInt(args[0]);
             try {
-                String missionName = missionManager.getMissionNames()[index];
+                String missionName = missionManager.getMissionNames().get(index);
                 missionManager.startMission(missionName);
             } catch (Exception e) {
                 commandSender.sendMessage("その番号のミッション無いって");
@@ -45,10 +49,10 @@ public class FirstCommand {
     private CommandHandler listCommand() {
         return context -> {
             CommandSender commandSender = context.getCommandSender();
-            String[] missionNames = missionManager.getMissionNames();
+            List<String> missionNames = missionManager.getMissionNames();
             commandSender.sendMessage(ChatColor.AQUA + "------------List------------");
-            for (int i = 0; i < missionNames.length; i++) {
-                commandSender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames[i]);
+            for (int i = 0; i < missionNames.size(); i++) {
+                commandSender.sendMessage(ChatColor.AQUA + "[" + i + "] " + ChatColor.YELLOW + missionNames.get(i));
             }
             commandSender.sendMessage(ChatColor.AQUA + "---------------------------" + ChatColor.WHITE);
         };

@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MissionManager {
 
@@ -59,8 +60,8 @@ public class MissionManager {
      * 登録されたすべてのミッション名を取得できます。
      * @return string[] すべてのミッション名
      */
-    public String[] getMissionNames() {
-        return missionMap.keySet().toArray(new String[0]);
+    public List<String> getMissionNames() {
+        return missionMap.keySet().stream().sorted().collect(Collectors.toList());
     }
 
     /**
