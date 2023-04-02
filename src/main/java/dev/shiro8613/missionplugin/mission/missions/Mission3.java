@@ -70,7 +70,7 @@ public class Mission3 extends Mission {
         nonHunters = getPlayers().stream().filter(p -> !testTeam(p, "oni")).toList();
         state = MissionState.OnGoing;
         player = getPlayers().get(0);
-        timeLimit = Timer.TICKS_1_MIN / 2; //* 5 ;
+        timeLimit = Timer.TICKS_1_MIN * 5;
 
 
         // 石のボタンを登録する処理　ここで座標を登録
