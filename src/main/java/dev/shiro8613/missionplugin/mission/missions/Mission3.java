@@ -63,7 +63,6 @@ public class Mission3 extends Mission {
             buttonLocation.setY(buttonLocation.getY() + 1);
             buttonLocationList.add(buttonLocation);
         }
-//        buttonLocationList.remove(buttonLocation);
 
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
@@ -156,8 +155,6 @@ public class Mission3 extends Mission {
     public void removeStoneButton(Location location) {
         Block block = location.getBlock();
         block.setType(Material.AIR);
-        player.sendMessage(String.valueOf(block.getType()));
-        player.sendMessage("ボタンを消去!");
     }
 
     // 石のボタンを上方向に回転させるメソッド
@@ -192,10 +189,17 @@ public class Mission3 extends Mission {
         var subTitle = Component.text("ボタンを押した人には俊足のポーションを与えました。", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
         Player key = getKeyByValue(pressedPlayers, 9);
-        player.sendMessage(key.getName());
 
-        for (Player pressedPlayer: pressedPlayers.keySet()) {
-            pressedPlayer.getInventory().addItem(reward);
+        // オンラインプレイヤーを取得
+        List<Player> onlinePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
+        // プレイヤー全員にポーション
+        for (Player player : onlinePlayers) {
+            if (pressedPlayers.get(player) != null)
+                player.getInventory().addItem(reward);
+            else {
+                var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
+                player.addPotionEffect(deBuff);
+            }
         }
         nonHunters.forEach(p -> {
             p.showTitle(Title.title(title, subTitle));
@@ -206,15 +210,20 @@ public class Mission3 extends Mission {
     }
 
     public void onFaild() {
-        state = MissionState.End;
         final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
         final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
-        var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
-        challengers.forEach(p -> {
-            p.addPotionEffect(deBuff);
+
+        /*
+        // ミッションに失敗してもポーション渡すんだったらこれ必要
+        for (Player pressedPlayer: pressedPlayers.keySet()) {
+            pressedPlayer.getInventory().addItem(reward);
+        }*/
+
+        nonHunters.forEach(p -> {
             p.showTitle(Title.title(failTitle, failSubTitle));
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
         });
+        state = MissionState.End;
     }
 
     private enum MissionState {Start, OnGoing, End}
