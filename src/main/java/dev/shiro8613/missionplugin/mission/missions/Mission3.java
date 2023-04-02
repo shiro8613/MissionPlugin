@@ -28,9 +28,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.lang.management.PlatformLoggingMXBean;
+import java.util.*;
 
 import static dev.shiro8613.missionplugin.mission.missions.Mission1.testTeam;
 import static org.bukkit.Bukkit.getServer;
@@ -44,15 +43,14 @@ public class Mission3 extends Mission {
     private List<Player> nonHunters = null;
     private int timeLimit;
     private List<Player> challengers = null;
-    private List<Player> pressedPlayers = new ArrayList<Player>();
+    private Map<Player,  Integer> pressedPlayers = new HashMap<>();
     private MissionState state = MissionState.Start;
     private Location buttonLocation;
     private List<Location> buttonLocationList = new ArrayList<Location>();
     
     private boolean allComplete = false;
 
-    @Override
-    public void Init() {
+    @Override public void Init() {
         challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
         nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
         state = MissionState.OnGoing;
@@ -71,13 +69,21 @@ public class Mission3 extends Mission {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
             Block block = playerInteractEvent.getClickedBlock();
             if (Objects.requireNonNull(block).getType().equals(Material.STONE_BUTTON)) {
-                player.sendMessage(String.valueOf(buttonLocationList.size()));
                 for (int i = 0; i < buttonLocationList.size(); i++) {
                     buttonLocation = buttonLocationList.get(i);
 
                     if (block.getLocation().equals(buttonLocation)) {
                         playerInteractEvent.setCancelled(true);
+
+                        Player pressedPlayer = playerInteractEvent.getPlayer();
+
                         player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
+
+                        if (pressedPlayers.isEmpty())
+                           pressedPlayers.put(pressedPlayer, 0);
+                        else
+                            pressedPlayers.put(pressedPlayer, pressedPlayers.get(pressedPlayer)+1);
+
                         removeStoneButton(buttonLocation);
                         buttonLocationList.remove(buttonLocation);
                     }
@@ -98,23 +104,13 @@ public class Mission3 extends Mission {
 
         getTimerManager().getTimerByName("mission.3.push_button").tickTimer();
 
-        if (getTimerManager().getTimerByName("mission.3.push_button").isFinished()) {
-            // ミッション失敗！
-            state = MissionState.End;
-            final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
-            final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
-            var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
-            challengers.forEach(p -> {
-                p.addPotionEffect(deBuff);
-                p.showTitle(Title.title(failTitle, failSubTitle));
-                p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
-            });
-        }
         if (buttonLocationList.isEmpty()) {
             // ミッション成功！
-            player.sendMessage(Component.text("ミッション3に成功!", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
-            getCommandManager().removeAll();
-            missionEnd();
+            onSuccess();
+        }
+        if (getTimerManager().getTimerByName("mission.3.push_button").isFinished()) {
+            // ミッション失敗！
+            onFaild();
         }
         if (state == MissionState.End) {
             player.sendMessage(Component.text("ミッション3を終了します", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
@@ -181,6 +177,44 @@ public class Mission3 extends Mission {
 
         directional.setFacing(newFacing);
         buttonBlock.setBlockData(directional);
+    }
+
+    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+    public void onSuccess() {
+        var title = Component.text("ミッションに成功", NamedTextColor.YELLOW);
+        var subTitle = Component.text("ボタンを押した人には俊足のポーションを与えました。", NamedTextColor.GRAY, TextDecoration.ITALIC);
+
+        Player key = getKeyByValue(pressedPlayers, 9);
+        player.sendMessage(key.getName());
+
+        for (Player pressedPlayer: pressedPlayers.keySet()) {
+            pressedPlayer.getInventory().addItem(reward);
+        }
+        nonHunters.forEach(p -> {
+            p.showTitle(Title.title(title, subTitle));
+            p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, Sound.Source.PLAYER, 1.0f, 1.0f));
+        });
+        getCommandManager().removeAll();
+        missionEnd();
+    }
+
+    public void onFaild() {
+        state = MissionState.End;
+        final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
+        final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
+        var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
+        challengers.forEach(p -> {
+            p.addPotionEffect(deBuff);
+            p.showTitle(Title.title(failTitle, failSubTitle));
+            p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
+        });
     }
 
     private enum MissionState {Start, OnGoing, End}
