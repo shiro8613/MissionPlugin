@@ -98,7 +98,7 @@ public class Mission2 extends Mission {
             p.sendMessage(Component.text("迷子のお知らせです。", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
             p.sendMessage(Component.text("ピンクのスカート", NamedTextColor.LIGHT_PURPLE).append(Component.text("を着て、サングラスを掛けた、", NamedTextColor.YELLOW)).append(Component.text("白玉のような女の子", NamedTextColor.WHITE)).append(Component.text("を探しています。", NamedTextColor.YELLOW)));
             // TODO: 使用時はリンク先を正しいものに変更するかリンクを開く機能を削除してください。
-            p.sendMessage(Component.text("もし見つけましたらその子と一緒に写真を撮り、写真を", NamedTextColor.YELLOW).append(Component.text("Discordの『#逃走中ミッション』チャンネル", NamedTextColor.GOLD)).clickEvent(ClickEvent.openUrl("https://discord.com/channels/1046066805552189440/1080796750303997973")).hoverEvent(Component.text("クリックするとWebブラウザで開きます")).append(Component.text("にお貼りください。", NamedTextColor.YELLOW)));
+            p.sendMessage(Component.text("もし見つけましたらその子と一緒に写真を撮り、写真を", NamedTextColor.YELLOW).append(Component.text("Discordの『#逃走中ミッション』チャンネル", NamedTextColor.GOLD)).append(Component.text("にお貼りください。", NamedTextColor.YELLOW)));
             p.sendMessage(Component.text("5人の逃走者が写真を貼ることができれば", NamedTextColor.YELLOW).append(Component.text("ミッション成功", NamedTextColor.GREEN)).append(Component.text("です。", NamedTextColor.YELLOW)));
             p.sendMessage(Component.text("全員に", NamedTextColor.YELLOW).append(reward.displayName().color(NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, true)).append(Component.text("をお渡しします。")));
             p.sendMessage(Component.text("もし制限時間内に達成できなければ、", NamedTextColor.YELLOW).append(Component.text("逃走者全員が10秒間発光します", NamedTextColor.RED, TextDecoration.UNDERLINED)).append(Component.text("。", NamedTextColor.YELLOW)));
