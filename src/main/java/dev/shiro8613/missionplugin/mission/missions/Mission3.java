@@ -9,7 +9,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,7 +17,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -35,32 +33,18 @@ import static org.bukkit.Bukkit.getServer;
 
 
 public class Mission3 extends Mission {
-    private final BossBar bar = Bukkit.createBossBar("残り時間:", BarColor.YELLOW, BarStyle.SOLID);
     private final ItemStack reward = new ItemStack(Material.AIR);
-    private final int requiredChecks = 5;
-    private Player player = null;
+    private final Map<Player, Integer> pressedPlayers = new HashMap<>();// List<Player>に変えても良いくらいだけど取り敢えず残しておこうかな
+    private final List<Location> buttonLocationList = new ArrayList<>();
     private List<Player> nonHunters = null;
     private int timeLimit;
     private List<Player> challengers = null;
-    private final Map<Player, Integer> pressedPlayers = new HashMap<>();
     private MissionState state = MissionState.Start;
     private Location buttonLocation;
-    private final List<Location> buttonLocationList = new ArrayList<Location>();
-
-    private final boolean allComplete = false;
-
-    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
 
     private void registerButton(BlockFace face) {
-        spawnStoneButton(buttonLocation.add(0,-1,0), face);
-        buttonLocation.add(0,1,0);
+        spawnStoneButton(buttonLocation.add(0, -1, 0), face);
+        buttonLocation.add(0, 1, 0);
         buttonLocationList.add(buttonLocation);
     }
 
@@ -69,7 +53,6 @@ public class Mission3 extends Mission {
         challengers = getPlayers().stream().filter(p -> testTeam(p, "nige")).toList();
         nonHunters = getPlayers().stream().filter(p -> !testTeam(p, "oni")).toList();
         state = MissionState.OnGoing;
-        player = getPlayers().get(0);
         timeLimit = Timer.TICKS_1_MIN * 5;
 
 
@@ -107,12 +90,9 @@ public class Mission3 extends Mission {
 
                         Player pressedPlayer = playerInteractEvent.getPlayer();
 
-                        player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
+                        challengers.forEach(p -> p.sendMessage(Component.text(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！", NamedTextColor.GREEN)));
 
-                        if (pressedPlayers.isEmpty())
-                            pressedPlayers.put(pressedPlayer, 0);
-                        else
-                            pressedPlayers.put(pressedPlayer, pressedPlayers.get(pressedPlayer) + 1);
+                        pressedPlayers.merge(pressedPlayer, 0, (c, _unused) -> c + 1);
 
                         removeStoneButton(buttonLocation);
                         buttonLocationList.remove(buttonLocation);
@@ -136,14 +116,14 @@ public class Mission3 extends Mission {
 
         if (buttonLocationList.isEmpty()) {
             // ミッション成功！
-            onSuccess();
+            onSucceeded();
         }
         if (getTimerManager().getTimerByName("mission.3.push_button").isFinished()) {
             // ミッション失敗！
-            onFaild();
+            onFailed();
         }
         if (state == MissionState.End) {
-            player.sendMessage(Component.text("ミッション3を終了します", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
+            nonHunters.forEach(p -> p.sendMessage(Component.text("ミッションを終了します", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD)));
             missionEnd();
         }
     }
@@ -152,8 +132,8 @@ public class Mission3 extends Mission {
     public void onDisable() {
         getTimerManager().discardTimerByName("mission.3.push_button");
         getCommandManager().removeAll();
-        for (Location l : buttonLocationList)
-            removeStoneButton(l);
+        buttonLocationList.forEach(this::removeStoneButton);
+        pressedPlayers.clear();
     }
 
     public void greet() {
@@ -204,23 +184,20 @@ public class Mission3 extends Mission {
         buttonBlock.setBlockData(directional);
     }
 
-    public void onSuccess() {
+    public void onSucceeded() {
         var title = Component.text("ミッションに成功", NamedTextColor.YELLOW);
         var subTitle = Component.text("ボタンを押した人には俊足のポーションを与えました。", NamedTextColor.GRAY, TextDecoration.ITALIC);
 
-        Player key = getKeyByValue(pressedPlayers, 9);
-
-        // オンラインプレイヤーを取得
-        List<Player> onlinePlayers = (List<Player>) Bukkit.getServer().getOnlinePlayers();
-        // プレイヤー全員にポーション
-        for (Player player : onlinePlayers) {
-            if (pressedPlayers.get(player) != null)
+        var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
+        challengers.forEach(player -> {
+            if (pressedPlayers.containsKey(player))
+                // 押したプレイヤー全員にポーション
                 player.getInventory().addItem(reward);
-            else {
-                var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
+            else if (!player.getScoreboardTags().contains("ded")) {
+                // 押せなかった人に発光付与
                 player.addPotionEffect(deBuff);
             }
-        }
+        });
         nonHunters.forEach(p -> {
             p.showTitle(Title.title(title, subTitle));
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, Sound.Source.PLAYER, 1.0f, 1.0f));
@@ -229,7 +206,7 @@ public class Mission3 extends Mission {
         missionEnd();
     }
 
-    public void onFaild() {
+    public void onFailed() {
         final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
         final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
 

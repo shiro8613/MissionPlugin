@@ -94,14 +94,14 @@ public class Mission1 extends Mission {
                 ctx.getCommandSender().sendMessage("上に感圧版を設置可能なブロックに焦点を合わせてコマンドを打ってください");
                 return;
             }
-            if (tmpPresPlate.isEmpty() && tmpPresPlate.canPlace(Material.STONE_PRESSURE_PLATE.createBlockData()) && triggers.stream().noneMatch(b -> b.getLocation().equals(tmpPresPlate.getLocation()))) {
+            if (tmpPresPlate.isEmpty() && tmpPresPlate.canPlace(Material.STONE_PRESSURE_PLATE.createBlockData()) && triggers.stream().noneMatch(b -> b.getLocation().equals(tmpPresPlate.getLocation())) && !tmpPresPlate.getLocation().equals(rewardPos)) {
                 triggers.add(tmpPresPlate);
                 ((Player) ctx.getCommandSender()).spawnParticle(Particle.REDSTONE, tmpPresPlate.getLocation().add(0.5d, 0.2d, 0.5), 15, new Particle.DustOptions(Color.LIME, 1.0f));
 
                 ctx.getCommandSender().sendMessage(Component.text(String.format("%d箇所目のトリガを設置しました。", triggers.size()), NamedTextColor.GREEN));
                 checkReady(ctx);
             } else {
-                ctx.getCommandSender().sendMessage(Component.text("このブロックの上に感圧板を設置できないか、既に登録済みです。", NamedTextColor.RED));
+                ctx.getCommandSender().sendMessage(Component.text("このブロックの上は感圧板を設置できないか、既にトリガや報酬チェストの地点として登録済みです。", NamedTextColor.RED));
             }
         }
     }
@@ -121,13 +121,13 @@ public class Mission1 extends Mission {
                 ctx.getCommandSender().sendMessage("上にチェストを設置可能なブロックに焦点を合わせてコマンドを打ってください");
                 return;
             }
-            if (tmpPresPlate.isEmpty()) {
+            if (tmpPresPlate.isEmpty() && triggers.stream().noneMatch(b -> b.getLocation().equals(tmpPresPlate.getLocation()))) {
                 rewardPos = tmpPresPlate.getLocation();
                 ((Player) ctx.getCommandSender()).spawnParticle(Particle.REDSTONE, tmpPresPlate.getLocation().add(0.5d, 0.2d, 0.5), 15, new Particle.DustOptions(Color.LIME, 1.0f));
                 ctx.getCommandSender().sendMessage(Component.text(String.format("報酬チェストの設置場所を%sに設定しました。", rewardPos.toString()), NamedTextColor.GREEN));
                 checkReady(ctx);
             } else {
-                ctx.getCommandSender().sendMessage(Component.text("このブロックの上には何かがあります。", NamedTextColor.RED));
+                ctx.getCommandSender().sendMessage(Component.text("このブロックの上は何かがあるか、トリガの地点として設定されているため設定できません。", NamedTextColor.RED));
             }
         }
     }

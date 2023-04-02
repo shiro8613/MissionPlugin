@@ -6,7 +6,6 @@ import dev.shiro8613.missionplugin.utils.timer.Timer;
 import dev.shiro8613.missionplugin.utils.timer.TimerEnum;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
@@ -29,15 +28,15 @@ public class Mission2 extends Mission {
 
     private final ItemStack reward = new ItemStack(Material.AIR);
     private final int requiredChecks = 5;
+    private final int timeLimit = 5 * Timer.TICKS_1_MIN;
     private List<Player> challengers = null;
     private List<Player> nonHunters = null;
     private MissionState state = MissionState.Start;
-    private int timeLimit = 5 * Timer.TICKS_1_MIN;
 
     @Override
     public void Init() {
-        challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
-        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
+        challengers = getPlayers().stream().filter(p -> testTeam(p, "nige")).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p, "oni")).toList();
 
         greet();
         // 雑に作ったTimerを使ってみる
@@ -63,7 +62,7 @@ public class Mission2 extends Mission {
         }
 
         if (state == MissionState.End) {
-            challengers.forEach(p -> p.sendMessage("ミッションを終了します"));
+            nonHunters.forEach(p -> p.sendMessage("ミッションを終了します"));
             // ここのメソッド動かない！！
             // そんな時代も414fdac919775820ce5dc2582d04c2b39dd34be1より前にはありました...
             missionEnd();
@@ -74,7 +73,7 @@ public class Mission2 extends Mission {
         ctx.getCommandSender().sendMessage(Component.text("1プレイヤーの画像の確認が済んだものとしてマークします。", NamedTextColor.AQUA));
         getTimerManager().getTimerByName("mission.2.approved_player").tickTimer();
         if (getTimerManager().getTimerByName("mission.2.approved_player").isFinished()) {
-            onSuccess();
+            onSucceeded();
         }
     }
 
@@ -105,7 +104,7 @@ public class Mission2 extends Mission {
         });
     }
 
-    public void onSuccess() {
+    public void onSucceeded() {
         state = MissionState.End;
         final var successTitle = Component.text("ミッション成功", NamedTextColor.GREEN);
         final var successSubTitle = Component.text("ミッションに成功したため、逃走者全員に報酬が配布されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
