@@ -59,8 +59,8 @@ public class Mission1 extends Mission {
         onStateChange();
         getEventManager().registerEventHandler(EventEnum.ClickEvent, this::onPressed);
 
-        challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
-        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
+        challengers = getPlayers().stream().filter(p -> testTeam(p, "nige")).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p, "oni")).toList();
 
         getTimerManager().createTimer("mission.1.come_on", TimerEnum.CountDown, timeLimit, BarColor.BLUE, BarStyle.SOLID);
         getTimerManager().createTimer("mission.1.reached", TimerEnum.TaskProgress, triggerCount, BarColor.GREEN, BarStyle.SEGMENTED_12);
@@ -147,9 +147,7 @@ public class Mission1 extends Mission {
         }
 
         if (ctx.getCommandSender() instanceof Player) {
-            triggers.forEach(b -> {
-                ((Player) ctx.getCommandSender()).spawnParticle(Particle.REDSTONE, b.getLocation().add(0.5d, 0.2d, 0.5), 5, new Particle.DustOptions(Color.LIME, 1.0f));
-            });
+            triggers.forEach(b -> ((Player) ctx.getCommandSender()).spawnParticle(Particle.REDSTONE, b.getLocation().add(0.5d, 0.2d, 0.5), 5, new Particle.DustOptions(Color.LIME, 1.0f)));
             if (rewardPos != null) {
                 ((Player) ctx.getCommandSender()).spawnParticle(Particle.REDSTONE, rewardPos.clone().add(0.5d, 0.2d, 0.5), 5, new Particle.DustOptions(Color.AQUA, 1.0f));
             }
@@ -195,8 +193,8 @@ public class Mission1 extends Mission {
                         p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
                     });
                 } else if (getTimerManager().getTimerByName("mission.1.reached").isFinished()) {
-                    final var successTitle = Component.text("ミッション成功", NamedTextColor.GREEN);
-                    final var successSubTitle = Component.text("ミッションに成功したため、報酬チェストが出現しました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
+                    final var successTitle = Component.text("ミッション達成", NamedTextColor.GREEN);
+                    final var successSubTitle = Component.text("ミッションを達成したため、報酬チェストが出現します。", NamedTextColor.GOLD, TextDecoration.ITALIC);
 
                     // 報酬チェスト召喚！
                     rewardPos.getBlock().setType(Material.CHEST);
