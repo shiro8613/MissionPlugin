@@ -10,17 +10,17 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -46,6 +46,7 @@ public class Mission4 extends Mission {
     private Location rewardPos = null;
     private Location momPos = null;
     private ShulkerBox box = null;
+    private Chest chest = null;
     private ArmorStand momArmor = null;
     private MissionState state = null;
     private Player successPlayer = null;
@@ -138,7 +139,7 @@ public class Mission4 extends Mission {
                 assert targetRes != null;
                 tmpPresPlate = Objects.requireNonNull(targetRes.getHitBlock()).getRelative(BlockFace.UP);
             } catch (NullPointerException _e) {
-                ctx.getCommandSender().sendMessage("上にチェストを設置可能なブロックに焦点を合わせてコマンドを打ってください");
+                ctx.getCommandSender().sendMessage("上に交換用シュルカーを設置可能なブロックに焦点を合わせてコマンドを打ってください");
                 return;
             }
             if (tmpPresPlate.isEmpty()) {
@@ -149,10 +150,10 @@ public class Mission4 extends Mission {
                 if (face.equals(BlockFace.NORTH) || face.equals(BlockFace.SOUTH)) {
                     momPos = new Location(rewardPos.getWorld(), rewardPos.getX() + 1.5, rewardPos.getY() + 1, rewardPos.getZ());
                 } else if (face.equals(BlockFace.WEST) || face.equals(BlockFace.EAST)) {
-                    momPos = new Location(rewardPos.getWorld(), rewardPos.getX(), rewardPos.getY() + 1, rewardPos.getZ() + 1.5);
+                    momPos = new Location(rewardPos.getWorld(), rewardPos.getX(), rewardPos.getY() + 1, rewardPos.getZ() - 1.5);
                 }
 
-                ctx.getCommandSender().sendMessage(Component.text(String.format("報酬チェストの設置場所を%sに設定しました。", rewardPos.toString()), NamedTextColor.GREEN));
+                ctx.getCommandSender().sendMessage(Component.text(String.format("交換用シュルカーの設置場所を%sに設定しました。", rewardPos.toString()), NamedTextColor.GREEN));
                 checkReady(ctx);
             } else {
                 ctx.getCommandSender().sendMessage(Component.text("このブロックの上には何かがあります。", NamedTextColor.RED));
@@ -173,9 +174,9 @@ public class Mission4 extends Mission {
             player.showTitle(Title.title(title, subTitle));
             player.playSound(Sound.sound(org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, Sound.Source.PLAYER, 1.0f, 1.0f));
 
-            player.sendMessage(Component.text("あら、コーヒーを買ってくるのを忘れちゃったわ。", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("あら、リンゴを買ってくるのを忘れちゃったわ。", NamedTextColor.YELLOW));
             player.sendMessage(Component.text("ちょっと そこのあなた、フードコートのカフェで", NamedTextColor.YELLOW));
-            player.sendMessage(Component.text("コーヒーを買ってきてくれないかしら。", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text("リンゴを買ってきてくれないかしら。", NamedTextColor.YELLOW));
             player.sendMessage(Component.text("持ってきてくれたら素敵なプレゼントをあげる。", NamedTextColor.YELLOW));
             player.sendMessage(Component.text("プレゼントは", NamedTextColor.YELLOW)
                             .append(Component.text("一人", NamedTextColor.AQUA)
@@ -211,7 +212,14 @@ public class Mission4 extends Mission {
                 rewardPos.getBlock().setType(Material.SHULKER_BOX);
                 box = (ShulkerBox) rewardPos.getBlock().getState();
                 momArmor = momPos.getWorld().spawn(momPos, ArmorStand.class);
-                //何かするならここ
+                momArmor.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+                momArmor.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+                momArmor.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+
+                Location location = new Location(rewardPos.getWorld(), -74, -60, -18);
+                location.getBlock().setType(Material.CHEST);
+                chest = (Chest) location.getBlock().getState();
+                chest.getInventory().setItem(1, pickedItem);
 
                 markingPlayer = new HashMap<>();
 
@@ -247,6 +255,7 @@ public class Mission4 extends Mission {
                 }
 
                 box.getBlock().setType(Material.AIR);
+                chest.getBlock().setType(Material.AIR);
                 momArmor.remove();
                 missionEnd();
             }
@@ -265,6 +274,7 @@ public class Mission4 extends Mission {
         rewardPos = null;
         momPos = null;
         box = null;
+        chest = null;
         momArmor = null;
         state = null;
         successPlayer = null;
