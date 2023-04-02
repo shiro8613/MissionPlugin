@@ -231,7 +231,9 @@ public class Mission4 extends Mission {
                         player.showTitle(Title.title(failTitle, failSubTitle));
                         player.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
                     });
-                    challenger.forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10 * Timer.TICKS_1_SEC, 1)));
+                    challenger.stream().filter(player -> !player.getScoreboardTags().contains("ded"))
+                            .forEach(player -> player.addPotionEffect(
+                                    new PotionEffect(PotionEffectType.BLINDNESS, 10 * Timer.TICKS_1_SEC, 1)));
                 } else {
                     Component successTitle = Component.text("ミッションがクリアされました", NamedTextColor.YELLOW);
                     Component successSubTitle = Component.text("");
