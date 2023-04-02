@@ -44,9 +44,12 @@ public class Mission3 extends Mission {
     private List<Player> nonHunters = null;
     private int timeLimit;
     private List<Player> challengers = null;
-    private List<Location> pushed_button = new ArrayList<Location>();
+    private List<Player> pressedPlayers = new ArrayList<Player>();
     private MissionState state = MissionState.Start;
     private Location buttonLocation;
+    private List<Location> buttonLocationList = new ArrayList<Location>();
+    
+    private boolean allComplete = false;
 
     @Override
     public void Init() {
@@ -55,31 +58,29 @@ public class Mission3 extends Mission {
         state = MissionState.OnGoing;
         player = getPlayers().get(0);
         timeLimit = 5 * Timer.TICKS_1_MIN;
-        buttonLocation = new Location(getServer().getWorld("world"), 0, 63, 11);
-        spawnStoneButton(buttonLocation);
-        buttonLocation.setY(buttonLocation.getY() + 1);
+
+        for (int i = 0; i <= 9; i++) {
+            buttonLocation = new Location(getServer().getWorld("world"), 0, 63, 11-(i+i));
+            spawnStoneButton(buttonLocation);
+            buttonLocation.setY(buttonLocation.getY() + 1);
+            buttonLocationList.add(buttonLocation);
+        }
+//        buttonLocationList.remove(buttonLocation);
 
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
             Block block = playerInteractEvent.getClickedBlock();
             if (Objects.requireNonNull(block).getType().equals(Material.STONE_BUTTON)) {
-                //1,1,1は座標
-                if (block.getLocation().equals(buttonLocation)) {
-                    playerInteractEvent.setCancelled(true);
-                    player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
-                    removeStoneButton(buttonLocation);
+                player.sendMessage(String.valueOf(buttonLocationList.size()));
+                for (int i = 0; i < buttonLocationList.size(); i++) {
+                    buttonLocation = buttonLocationList.get(i);
 
-                    /*
-                    //処理
-                    if (pushed_button.contains(buttonLocation)) {
-                        player.sendMessage("このボタンは押されてます！違うボタンを探してください！");
-                    }
-                    else {
+                    if (block.getLocation().equals(buttonLocation)) {
+                        playerInteractEvent.setCancelled(true);
                         player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
-                        // 押下済みのボタン登録
-                        pushed_button.add(buttonLocation);
+                        removeStoneButton(buttonLocation);
+                        buttonLocationList.remove(buttonLocation);
                     }
-                    */
                 }
             }
         });
@@ -108,6 +109,12 @@ public class Mission3 extends Mission {
                 p.showTitle(Title.title(failTitle, failSubTitle));
                 p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
             });
+        }
+        if (buttonLocationList.isEmpty()) {
+            // ミッション成功！
+            player.sendMessage(Component.text("ミッション3に成功!", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
+            getCommandManager().removeAll();
+            missionEnd();
         }
         if (state == MissionState.End) {
             player.sendMessage(Component.text("ミッション3を終了します", NamedTextColor.YELLOW, TextDecoration.UNDERLINED, TextDecoration.BOLD));
@@ -170,7 +177,7 @@ public class Mission3 extends Mission {
 
         Directional directional = (Directional) buttonData;
         BlockFace currentFacing = directional.getFacing();
-        BlockFace newFacing = BlockFace.NORTH;
+        BlockFace newFacing = currentFacing;
 
         directional.setFacing(newFacing);
         buttonBlock.setBlockData(directional);
