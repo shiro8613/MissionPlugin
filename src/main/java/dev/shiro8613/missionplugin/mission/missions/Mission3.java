@@ -243,6 +243,8 @@ public class Mission3 extends Mission {
             p.showTitle(Title.title(failTitle, failSubTitle));
             p.playSound(Sound.sound(org.bukkit.Sound.ENTITY_ELDER_GUARDIAN_CURSE, Sound.Source.HOSTILE, 1f, 1.1f));
         });
+        var deBuff = new PotionEffect(PotionEffectType.GLOWING, Timer.TICKS_1_SEC * 10, 1);
+        challengers.forEach(p -> p.addPotionEffect(deBuff));
         state = MissionState.End;
     }
 
