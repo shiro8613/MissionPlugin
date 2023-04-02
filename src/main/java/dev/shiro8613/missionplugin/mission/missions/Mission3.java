@@ -50,18 +50,24 @@ public class Mission3 extends Mission {
     
     private boolean allComplete = false;
 
+    private void registerButton() {
+        spawnStoneButton(buttonLocation);
+        buttonLocation.setY(buttonLocation.getY() + 1);
+        buttonLocationList.add(buttonLocation);
+    }
+
     @Override public void Init() {
         challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
         nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
         state = MissionState.OnGoing;
         player = getPlayers().get(0);
-        timeLimit = 5 * Timer.TICKS_1_MIN;
+        timeLimit = Timer.TICKS_1_MIN/2; //* 5 ;
 
+
+        // 石のボタンを登録する処理　ここで座標を登録
         for (int i = 0; i <= 9; i++) {
             buttonLocation = new Location(getServer().getWorld("world"), 0, 63, 11-(i+i));
-            spawnStoneButton(buttonLocation);
-            buttonLocation.setY(buttonLocation.getY() + 1);
-            buttonLocationList.add(buttonLocation);
+            registerButton();
         }
 
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
@@ -121,7 +127,8 @@ public class Mission3 extends Mission {
     public void onDisable() {
         getTimerManager().discardTimerByName("mission.3.push_button");
         getCommandManager().removeAll();
-        removeStoneButton(buttonLocation);
+        for (Location l : buttonLocationList)
+            removeStoneButton(l);
     }
 
     public void greet() {
