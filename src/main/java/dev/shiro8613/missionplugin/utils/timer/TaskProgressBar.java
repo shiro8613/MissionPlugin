@@ -11,11 +11,11 @@ import org.jetbrains.annotations.Nullable;
 public class TaskProgressBar extends Timer {
     public TaskProgressBar(int goal, BarColor barColor, BarStyle barStyle, @Nullable BarFlag... barFlags) {
         super(goal, TimerEnum.CountDown, barColor, barStyle, barFlags);
+        this.setPrefix("ミッション完了まであと ");
+        this.setSuffix("人");
         this.tickProgress = 0;
         this.updateRemainingTime();
         this.bar.setProgress(0);
-        this.setPrefix("ミッション完了まであと ");
-        this.setSuffix("人");
     }
 
     @Override
