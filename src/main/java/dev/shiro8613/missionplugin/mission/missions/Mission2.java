@@ -32,7 +32,7 @@ public class Mission2 extends Mission {
     private List<Player> challengers = null;
     private List<Player> nonHunters = null;
     private MissionState state = MissionState.Start;
-    private int timeLimit = 6 * Timer.TICKS_1_MIN;
+    private int timeLimit = 5 * Timer.TICKS_1_MIN;
 
     @Override
     public void Init() {
