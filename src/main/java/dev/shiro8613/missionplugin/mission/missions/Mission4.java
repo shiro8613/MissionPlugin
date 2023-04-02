@@ -199,9 +199,7 @@ public class Mission4 extends Mission {
     private void onStateChange() {
         getCommandManager().removeAll();
         switch (state) {
-            case Setup -> {
-                getCommandManager().addCmd("setRewardPos", this::setRewardPosCmd);
-            }
+            case Setup -> getCommandManager().addCmd("setRewardPos", this::setRewardPosCmd);
             case Ready -> {
                 getCommandManager().addCmd("setRewardPos", this::setRewardPosCmd);
                 getCommandManager().addCmd("start", this::startCmd);
