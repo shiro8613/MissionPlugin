@@ -28,7 +28,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.lang.management.PlatformLoggingMXBean;
 import java.util.*;
 
 import static dev.shiro8613.missionplugin.mission.missions.Mission1.testTeam;
@@ -43,32 +42,58 @@ public class Mission3 extends Mission {
     private List<Player> nonHunters = null;
     private int timeLimit;
     private List<Player> challengers = null;
-    private Map<Player,  Integer> pressedPlayers = new HashMap<>();
+    private final Map<Player, Integer> pressedPlayers = new HashMap<>();
     private MissionState state = MissionState.Start;
     private Location buttonLocation;
-    private List<Location> buttonLocationList = new ArrayList<Location>();
-    
-    private boolean allComplete = false;
+    private final List<Location> buttonLocationList = new ArrayList<Location>();
 
-    private void registerButton() {
-        spawnStoneButton(buttonLocation);
-        buttonLocation.setY(buttonLocation.getY() + 1);
+    private final boolean allComplete = false;
+
+    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private void registerButton(BlockFace face) {
+        spawnStoneButton(buttonLocation.add(0,-1,0), face);
+        buttonLocation.add(0,1,0);
         buttonLocationList.add(buttonLocation);
     }
 
-    @Override public void Init() {
-        challengers = getPlayers().stream().filter(p -> testTeam(p,"nige")).toList();
-        nonHunters = getPlayers().stream().filter(p -> !testTeam(p,"oni")).toList();
+    @Override
+    public void Init() {
+        challengers = getPlayers().stream().filter(p -> testTeam(p, "nige")).toList();
+        nonHunters = getPlayers().stream().filter(p -> !testTeam(p, "oni")).toList();
         state = MissionState.OnGoing;
         player = getPlayers().get(0);
-        timeLimit = Timer.TICKS_1_MIN/2; //* 5 ;
+        timeLimit = Timer.TICKS_1_MIN / 2; //* 5 ;
 
 
         // 石のボタンを登録する処理　ここで座標を登録
-        for (int i = 0; i <= 9; i++) {
-            buttonLocation = new Location(getServer().getWorld("world"), 0, 63, 11-(i+i));
-            registerButton();
-        }
+        buttonLocation = new Location(getServer().getWorld("world"), 40, -60, 31);//N
+        registerButton(BlockFace.NORTH);
+        buttonLocation = new Location(getServer().getWorld("world"), 2, -43, 25);//N
+        registerButton(BlockFace.NORTH);
+        buttonLocation = new Location(getServer().getWorld("world"), -40, -60, 28);//W
+        registerButton(BlockFace.WEST);
+        buttonLocation = new Location(getServer().getWorld("world"), 10, -52, 62);//N
+        registerButton(BlockFace.NORTH);
+        buttonLocation = new Location(getServer().getWorld("world"), -36, -44, -8);//E
+        registerButton(BlockFace.EAST);
+        buttonLocation = new Location(getServer().getWorld("world"), -33, -50, 3);//E
+        registerButton(BlockFace.EAST);
+        buttonLocation = new Location(getServer().getWorld("world"), -4, -60, -19);//N
+        registerButton(BlockFace.NORTH);
+        buttonLocation = new Location(getServer().getWorld("world"), -95, -24, 24);//W
+        registerButton(BlockFace.WEST);
+        buttonLocation = new Location(getServer().getWorld("world"), 29, -35, 34);//N
+        registerButton(BlockFace.NORTH);
+        buttonLocation = new Location(getServer().getWorld("world"), -18, -60, 7);//S
+        registerButton(BlockFace.SOUTH);
 
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
@@ -85,9 +110,9 @@ public class Mission3 extends Mission {
                         player.sendMessage(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！");
 
                         if (pressedPlayers.isEmpty())
-                           pressedPlayers.put(pressedPlayer, 0);
+                            pressedPlayers.put(pressedPlayer, 0);
                         else
-                            pressedPlayers.put(pressedPlayer, pressedPlayers.get(pressedPlayer)+1);
+                            pressedPlayers.put(pressedPlayer, pressedPlayers.get(pressedPlayer) + 1);
 
                         removeStoneButton(buttonLocation);
                         buttonLocationList.remove(buttonLocation);
@@ -152,10 +177,10 @@ public class Mission3 extends Mission {
     }
 
     // 石のボタンを座標指定で出現させる関数
-    public void spawnStoneButton(Location location) {
+    public void spawnStoneButton(Location location, BlockFace face) {
         Block buttonBlock = location.getBlock().getRelative(BlockFace.UP); // 上向きの石のボタンを作成するためにブロックの上の位置を取得する
         buttonBlock.setType(Material.STONE_BUTTON); // ブロックを石のボタンに設定
-        rotateButtonUp(buttonBlock);
+        rotateButtonUp(buttonBlock, face);
     }
 
     // 石のボタンを座標指定で消す関数
@@ -165,32 +190,20 @@ public class Mission3 extends Mission {
     }
 
     // 石のボタンを上方向に回転させるメソッド
-    public void rotateButtonUp(Block buttonBlock) {
+    public void rotateButtonUp(Block buttonBlock, BlockFace face) {
         if (buttonBlock.getType() != Material.STONE_BUTTON) {
             return;
         }
 
         BlockData buttonData = buttonBlock.getBlockData();
-        if (!(buttonData instanceof Directional)) {
+        if (!(buttonData instanceof Directional directional)) {
             return;
         }
 
-        Directional directional = (Directional) buttonData;
-        BlockFace currentFacing = directional.getFacing();
-        BlockFace newFacing = currentFacing;
-
-        directional.setFacing(newFacing);
+        directional.setFacing(face);
         buttonBlock.setBlockData(directional);
     }
 
-    public static <K, V> K getKeyByValue(Map<K, V> map, V value) {
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
     public void onSuccess() {
         var title = Component.text("ミッションに成功", NamedTextColor.YELLOW);
         var subTitle = Component.text("ボタンを押した人には俊足のポーションを与えました。", NamedTextColor.GRAY, TextDecoration.ITALIC);
