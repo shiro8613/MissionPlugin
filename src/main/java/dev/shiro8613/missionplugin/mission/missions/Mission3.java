@@ -81,7 +81,7 @@ public class Mission3 extends Mission {
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
             Block block = playerInteractEvent.getClickedBlock();
-            else if (Objects.nonNull(block) && block.getType().equals(Material.STONE_BUTTON)) {
+            if (Objects.nonNull(block) && block.getType().equals(Material.STONE_BUTTON)) {
                 for (int i = 0; i < buttonLocationList.size(); i++) {
                     buttonLocation = buttonLocationList.get(i);
 
