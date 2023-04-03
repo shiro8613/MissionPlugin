@@ -85,9 +85,7 @@ public class Mission3 extends Mission {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
             Block block = playerInteractEvent.getClickedBlock();
             if (Objects.nonNull(block) && block.getType().equals(Material.STONE_BUTTON)) {
-                for (int i = 0; i < buttonLocationList.size(); i++) {
-                    buttonLocation = buttonLocationList.get(i);
-
+                buttonLocationList.removeIf(buttonLocation -> {
                     if (block.getLocation().equals(buttonLocation)) {
                         playerInteractEvent.setCancelled(true);
 
@@ -98,11 +96,12 @@ public class Mission3 extends Mission {
                         pressedPlayers.merge(pressedPlayer, 0, (c, _unused) -> c + 1);
 
                         removeStoneButton(buttonLocation);
-                        buttonLocationList.remove(buttonLocation);
                         TaskProgressBar timerByName = (TaskProgressBar) getTimerManager().getTimerByName("mission.3.count_button");
                         timerByName.setCurrent(10 - buttonLocationList.size());
+                        return true;
                     }
-                }
+                    return false;
+                });
             }
         });
 
