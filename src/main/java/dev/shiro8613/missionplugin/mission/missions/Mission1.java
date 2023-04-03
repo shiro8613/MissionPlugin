@@ -217,7 +217,7 @@ public class Mission1 extends Mission {
     public void onPressed(EventContext ctx) {
         var event = (PlayerInteractEvent) ctx.getEvent(EventEnum.ClickEvent);
         if (challengers.contains(event.getPlayer())) {
-            if (event.getAction() == Action.PHYSICAL && Objects.requireNonNull(event.getClickedBlock()).getType() == Material.STONE_PRESSURE_PLATE && triggers.stream().anyMatch(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))) {
+            if (event.getAction() == Action.PHYSICAL && Objects.nonNull(event.getClickedBlock()) && event.getClickedBlock().getType() == Material.STONE_PRESSURE_PLATE && triggers.stream().anyMatch(b -> b.getLocation().equals(event.getClickedBlock().getLocation()))) {
                 checking.put(event.getClickedBlock(), event.getPlayer());
             }
         }
