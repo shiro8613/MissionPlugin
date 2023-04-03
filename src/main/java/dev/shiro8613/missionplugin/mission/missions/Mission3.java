@@ -2,6 +2,7 @@ package dev.shiro8613.missionplugin.mission.missions;
 
 import dev.shiro8613.missionplugin.event.EventEnum;
 import dev.shiro8613.missionplugin.mission.Mission;
+import dev.shiro8613.missionplugin.utils.timer.TaskProgressBar;
 import dev.shiro8613.missionplugin.utils.timer.Timer;
 import dev.shiro8613.missionplugin.utils.timer.TimerEnum;
 import net.kyori.adventure.sound.Sound;
@@ -38,6 +39,7 @@ public class Mission3 extends Mission {
     private final List<Location> buttonLocationList = new ArrayList<>();
     private List<Player> nonHunters = null;
     private int timeLimit;
+    private int buttonNum;
     private List<Player> challengers = null;
     private MissionState state = MissionState.Start;
     private Location buttonLocation;
@@ -54,6 +56,7 @@ public class Mission3 extends Mission {
         nonHunters = getPlayers().stream().filter(p -> !testTeam(p, "oni")).toList();
         state = MissionState.OnGoing;
         timeLimit = Timer.TICKS_1_MIN * 5;
+        buttonNum = 10;
 
 
         // 石のボタンを登録する処理　ここで座標を登録
@@ -96,6 +99,8 @@ public class Mission3 extends Mission {
 
                         removeStoneButton(buttonLocation);
                         buttonLocationList.remove(buttonLocation);
+                        TaskProgressBar timerByName = (TaskProgressBar) getTimerManager().getTimerByName("mission.3.count_button");
+                        timerByName.setCurrent(10 - buttonLocationList.size());
                     }
                 }
             }
@@ -104,9 +109,18 @@ public class Mission3 extends Mission {
         greet();
 
         getTimerManager().createTimer("mission.3.push_button", TimerEnum.CountDown, timeLimit, BarColor.BLUE, BarStyle.SOLID);
+        getTimerManager().createTimer("mission.3.count_button", TimerEnum.TaskProgress, buttonLocationList.size(), BarColor.YELLOW, BarStyle.SOLID);
 
         getTimerManager().getTimerByName("mission.3.push_button").setSubscribers(nonHunters);
+        getTimerManager().getTimerByName("mission.3.count_button").setSubscribers(nonHunters);
         getTimerManager().getTimerByName("mission.3.push_button").setVisibility(true);
+        getTimerManager().getTimerByName("mission.3.count_button").setVisibility(true);
+
+        TaskProgressBar timerByName = (TaskProgressBar) getTimerManager().getTimerByName("mission.3.count_button");
+        timerByName.setCurrent(0);
+
+        getTimerManager().getTimerByName("mission.3.count_button").setPrefix("残りのボタン：");
+        getTimerManager().getTimerByName("mission.3.count_button").setSuffix("個");
     }
 
     @Override
@@ -131,6 +145,7 @@ public class Mission3 extends Mission {
     @Override
     public void onDisable() {
         getTimerManager().discardTimerByName("mission.3.push_button");
+        getTimerManager().discardTimerByName("mission.3.count_button");
         getCommandManager().removeAll();
         buttonLocationList.forEach(this::removeStoneButton);
         pressedPlayers.clear();
