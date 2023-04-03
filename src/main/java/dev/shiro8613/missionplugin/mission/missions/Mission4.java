@@ -116,7 +116,7 @@ public class Mission4 extends Mission {
         Player player = (Player) event.getWhoClicked();
         InventoryAction action = event.getAction();
         if (placeActions.contains(action)) {
-            if (Objects.requireNonNull(event.getCursor()).equals(pickedItem)) {
+            if  ( Objects.nonNull(event.getCursor()) && event.getCursor().equals(pickedItem)) {
                 if (markingPlayer.containsKey(player)) {
                     box.getInventory().clear();
                     box.getInventory().setItem(1, giveItem);
