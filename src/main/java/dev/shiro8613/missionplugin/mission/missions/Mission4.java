@@ -104,7 +104,7 @@ public class Mission4 extends Mission {
         PlayerInteractEvent event = eventContext.getEvent(EventEnum.ClickEvent);
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        if (Objects.requireNonNull(block).getType().equals(Material.SHULKER_BOX) && block.getLocation().equals(box.getLocation())) {
+        if ( Objects.nonNull(block) && block.getType().equals(Material.SHULKER_BOX) && block.getLocation().equals(box.getLocation())) {
             if (player.getInventory().contains(pickedItem)) {
                 markingPlayer.putIfAbsent(player, false);
             }
