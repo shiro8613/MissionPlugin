@@ -81,7 +81,7 @@ public class Mission3 extends Mission {
         getEventManager().registerEventHandler(EventEnum.ClickEvent, eventContext -> {
             PlayerInteractEvent playerInteractEvent = eventContext.getEvent(EventEnum.ClickEvent);
             Block block = playerInteractEvent.getClickedBlock();
-            if (Objects.requireNonNull(block).getType().equals(Material.STONE_BUTTON)) {
+            else if (Objects.nonNull(block) && block.getType().equals(Material.STONE_BUTTON)) {
                 for (int i = 0; i < buttonLocationList.size(); i++) {
                     buttonLocation = buttonLocationList.get(i);
 
@@ -209,12 +209,6 @@ public class Mission3 extends Mission {
     public void onFailed() {
         final var failTitle = Component.text("ミッション失敗", NamedTextColor.RED);
         final var failSubTitle = Component.text("ミッションに失敗したため、逃走者全員に発光エフェクトが付与されました。", NamedTextColor.GOLD, TextDecoration.ITALIC);
-
-        /*
-        // ミッションに失敗してもポーション渡すんだったらこれ必要
-        for (Player pressedPlayer: pressedPlayers.keySet()) {
-            pressedPlayer.getInventory().addItem(reward);
-        }*/
 
         nonHunters.forEach(p -> {
             p.showTitle(Title.title(failTitle, failSubTitle));
