@@ -88,16 +88,12 @@ public class Mission3 extends Mission {
                 buttonLocationList.removeIf(buttonLocation -> {
                     if (block.getLocation().equals(buttonLocation)) {
                         playerInteractEvent.setCancelled(true);
-
-                        Player pressedPlayer = playerInteractEvent.getPlayer();
-
                         challengers.forEach(p -> p.sendMessage(Component.text(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！", NamedTextColor.GREEN)));
 
-                        pressedPlayers.merge(pressedPlayer, 0, (c, _unused) -> c + 1);
+                        pressedPlayers.merge(playerInteractEvent.getPlayer(), 0, (c, _unused) -> c + 1);
 
                         removeStoneButton(buttonLocation);
-                        TaskProgressBar timerByName = (TaskProgressBar) getTimerManager().getTimerByName("mission.3.count_button");
-                        timerByName.setCurrent(10 - buttonLocationList.size());
+                        ((TaskProgressBar) getTimerManager().getTimerByName("mission.3.count_button")).setCurrent(10 - buttonLocationList.size());
                         return true;
                     }
                     return false;
