@@ -88,6 +88,7 @@ public class Mission3 extends Mission {
                 buttonLocationList.removeIf(buttonLocation -> {
                     if (block.getLocation().equals(buttonLocation)) {
                         playerInteractEvent.setCancelled(true);
+                        if (!challengers.contains(playerInteractEvent.getPlayer()) || playerInteractEvent.getPlayer().getScoreboardTags().contains("ded")) return false;
                         challengers.forEach(p -> p.sendMessage(Component.text(playerInteractEvent.getPlayer().getName() + "にボタンが押されました！", NamedTextColor.GREEN)));
 
                         pressedPlayers.merge(playerInteractEvent.getPlayer(), 0, (c, _unused) -> c + 1);
